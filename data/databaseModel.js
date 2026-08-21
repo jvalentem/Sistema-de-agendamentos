@@ -25,14 +25,14 @@ usuarios.push(cliente)
 
 
 //SERVICOS, HORARIOS
-const corteDeCabelo = new Servico('Cortes de cabelo',funcionario.getId());
+const corteDeCabelo = new Servico('Cortes de cabelo',funcionario,[],45,30);
 corteDeCabelo.setId(servicos.length + 1);
 
 const horariosCorte = [new Horario('15:00',corteDeCabelo.getId())];
 corteDeCabelo.addHorario(horariosCorte);
 servicos.push(corteDeCabelo);
 
-const psicologia = new Servico('Psicologia',funcionario.getId());
+const psicologia = new Servico('Psicologia',funcionario,[],70,50);
 psicologia.setId(servicos.length + 1)
 
 const horariosPsicologa = [new Horario('16:50',psicologia.getId()), new Horario('17:30',psicologia.getId())];
@@ -46,3 +46,5 @@ agendamentos.push(agendamentoCorte);
 
 const agendamentoPsicologia = new Agendamento(psicologia,horariosPsicologa[1],cliente.id);
 agendamentos.push(agendamentoPsicologia)
+
+module.exports = {usuarios,servicos,agendamentos}

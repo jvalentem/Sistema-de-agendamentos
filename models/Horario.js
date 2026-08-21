@@ -6,7 +6,7 @@ class Horario{
     }
 
     generateId(serviceId){
-        return `sid${serviceId}at-${this.hora.replace(':','')}`
+        return `sid-${serviceId}at${this.hora.replace(':','')}`
     }
 
     setHora(hora){this.hora = hora}

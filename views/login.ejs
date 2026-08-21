@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <title>Faça login no sistema de agendamento</title>
+</head>
+<body>
+    <h2>Sistema basico de login</h2>
+    <div class="error-message-box">
+        <h3 class="error-message"></h3>
+    </div>
+    <form method="">
+        <input type="text" id="nome" name="nome">
+        <input type="password" name="senha" id="senha">
+        <button type="submit" id="login">Entrar</buttonb>
+    </form>
+
+    <script>
+        const form = document.querySelector('form');
+        const submit = document.getElementById('login')
+
+        function login(){
+            const nome = form.querySelector('input#nome').value;
+            const senha = form.querySelector('input#senha').value;
+
+            fetch('/usuario/login',{
+                method:'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'},
+                body: JSON.stringify({nome,senha})
+            })
+            .then(res => {
+                if(!res.ok) return res.json().then(data => {throw new Error(data.error_message)})
+                
+                return res.json();
+            })
+            .then(details => {
+                window.location.href = details.redirectTo;
+            }).catch(err=>{
+                 const errorMessageBox = document.querySelector('.error-message-box');
+                 const errorMessage = errorMessageBox.querySelector('h3');
+                 errorMessage.textContent = `Erro: ${err.message}`;
+            })
+        }
+        
+        form.addEventListener('submit',e=>{
+            e.preventDefault();
+            login();
+        })
+        
+        // form.onsubmit = ()=> login();
+        // submit.onclick = ()=> login();
+    </script>
+</body>
+</html>

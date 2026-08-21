@@ -1,8 +1,10 @@
 class Servico{
-    constructor(nome,funcionarioId,horarios){
+    constructor(nome,funcionario,horarios,preco,duracao){
         this.nome = nome;
-        this.funcionarioId = funcionarioId;
+        this.funcionario = funcionario;
         this.horarios = horarios || [];
+        this.preco = preco;
+        this.duracao = duracao
     }
 
     setId(id){this.id = id} //O id vai ser baseado no tamanho do index do array de usuarios
