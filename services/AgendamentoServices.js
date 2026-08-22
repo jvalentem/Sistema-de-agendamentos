@@ -1,4 +1,6 @@
 const data = require('../data/databaseModel')
+const AgendamentoModel = require('../models/Agendamento')
+
 class AgendamentoService{
     static getAgendamentoBySID(sid){
         const agendamento = data.agendamentos.find(a => a.id === sid)
@@ -20,6 +22,12 @@ class AgendamentoService{
         if(!agendamento) return false;
 
         data.agendamentos.splice(agendamento,1);
+    }
+
+    static createAgendamento(servico,horario,clienteId){
+        const agendamento = new AgendamentoModel(servico,horario,clienteId);
+       
+        return agendamento || false;
     }
 }
 

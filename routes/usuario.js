@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 const {UserService} = require('../services/UserService');
 
+
+router.get('/me',(req,res)=>{
+    if(!req.session.user) return res.redirect('/');
+    console.log(req.session.user);
+    const userAgendamentos = UserService.getUserAgendamentos(req.session.user.id);
+    console.log(userAgendamentos)
+    res.render('me',{userAgendamentos})
+})
+
 router.post('/login',(req,res)=>{
     const nome = req.body.nome;
     const senha = req.body.senha

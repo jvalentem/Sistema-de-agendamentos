@@ -1,11 +1,18 @@
-const data = require('./data/databaseModel')
-const path = require('path')
+//Routers
 const agendamentoRouter = require('./routes/agendamentos')
 const usuarioRouter = require('./routes/usuario')
+const servicosRouter = require('./routes/servicos');
+
+const data = require('./data/databaseModel')
+const path = require('path')
+
+
 const bodyParser = require('body-parser')
 const express = require('express');
 const session = require('express-session');
 const app = express();
+
+app.locals.partials = path.join(__dirname + '/partials/')
 
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname + '/views'));
@@ -33,6 +40,8 @@ app.use((req, res, next) => {
 
 app.use('/agendamento', agendamentoRouter);
 app.use('/usuario', usuarioRouter)
+app.use('/servico',servicosRouter);
+app.use(express.static('public')) //arquivos estáticos
 
 
 app.listen(3000,()=>{console.log('server online')})

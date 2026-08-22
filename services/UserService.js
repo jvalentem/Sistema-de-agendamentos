@@ -9,6 +9,15 @@ class UserService{
         return user || false;
 
     }
+
+    static getUserAgendamentos(userId){
+        const isUserZero = userId === 0;
+        if(!userId && !isUserZero) return false;
+
+        const userAgendamentos = data.agendamentos.filter(a => a.horario.clienteId === Number(userId));
+
+        return userAgendamentos || [];
+    }
 }
 
 module.exports = {UserService}

@@ -1,5 +1,3 @@
-<!--If session.acesso: include-->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,35 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%=servico.nome%></title>
 </head>
-<body>
-    <h1><%=servico.nome%></h1>
-<!--If session.acesso: include-->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%=servico.nome%></title>
-</head>
 <body>
     <h1><%=servico.nome%></h1>
     <div class="horarios">
         <h2>Horários Disponíveis:</h2>
-        <% if(servico.horarios.every(horario => horario.cliente != null)){%>
+        <% if(servico.horarios.every(horario => horario.clienteId != null)){%>
             <h3>Nenhum horário disponível para esse serviço!</h3>
         <%}%>
-
         <%servico.horarios.forEach(horario=>{%>
-            <%if(horario.cliente == null){%>
+            <%if(horario.clienteId == null){%>
                 <div class="horario">
                     <p><%=horario.hora%></p>
-                    <a href="/api/services/<%= servico.id %>/agendamento/<%= horario.id %>">Agende nesse horário</a> <!-- link completo para criar agendamento usando serviceId + horarioId -->
+                    <button id=<%= `${horario.id}`%> class="agendamentoButton">Agende nesse horário</button> <!-- fetch no js -->
                 </div>
             <%}%>
         <%})%>
     </div>
-</body>
-</html>
+
+    <script>
+        const agendamentoButtons = document.querySelectorAll('button.agendamentoButton');
+        
+        function defineAgendamentoButtons(){
+            agendamentoButtons.forEach(b => {
+                const sid = b.getAttribute('id');
+                if(!sid) return false; 
+
+                b.onclick = ()=>{
+                    fetch(`/servico/agendar/${sid}`,{method:'POST'})
+                    // .then(res.json())
+                    // .then(details=>{console.log(details)})
+                }
+            })
+        }
+        defineAgendamentoButtons()
+    </script>
 </body>
 </html>

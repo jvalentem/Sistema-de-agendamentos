@@ -29,22 +29,22 @@ const corteDeCabelo = new Servico('Cortes de cabelo',funcionario,[],45,30);
 corteDeCabelo.setId(servicos.length + 1);
 
 const horariosCorte = [new Horario('15:00',corteDeCabelo.getId())];
-corteDeCabelo.addHorario(horariosCorte);
+corteDeCabelo.setHorarios(horariosCorte);
 servicos.push(corteDeCabelo);
 
 const psicologia = new Servico('Psicologia',funcionario,[],70,50);
 psicologia.setId(servicos.length + 1)
 
 const horariosPsicologa = [new Horario('16:50',psicologia.getId()), new Horario('17:30',psicologia.getId())];
-psicologia.addHorario(horariosPsicologa);
+psicologia.setHorarios(horariosPsicologa);
 servicos.push(psicologia)
 
-//AGENDAMENTOS 
+// //AGENDAMENTOS 
 
-const agendamentoCorte = new Agendamento(corteDeCabelo,horariosCorte[0],cliente.id)
-agendamentos.push(agendamentoCorte);
+// const agendamentoCorte = new Agendamento(corteDeCabelo,horariosCorte[0],cliente.id)
+// agendamentos.push(agendamentoCorte);
 
-const agendamentoPsicologia = new Agendamento(psicologia,horariosPsicologa[1],cliente.id);
-agendamentos.push(agendamentoPsicologia)
+// const agendamentoPsicologia = new Agendamento(psicologia,horariosPsicologa[1],cliente.id);
+// agendamentos.push(agendamentoPsicologia)
 
 module.exports = {usuarios,servicos,agendamentos}

@@ -16,6 +16,8 @@ router.get('/detalhar/:id/cancelar',(req,res)=>{
 
 })
 
+
+
 router.delete('/:id',(req,res)=>{
     AgendamentoService.deleteAgendamento(req.params.id);
 })

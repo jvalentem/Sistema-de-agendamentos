@@ -1,0 +1,56 @@
+*{
+    margin:0;
+    padding: 0;
+}
+
+body {
+    position: relative;
+}
+
+form{
+    width: 20em; 
+    display: flex;
+    flex-direction: column;
+}
+
+header nav{
+    display: flex;
+    justify-content: space-around;
+    padding: 1em;
+}
+header ul{
+    display: flex;
+    justify-content: space-around;
+    gap:1em;
+    list-style-type: none;
+}
+
+.servico-box{
+    padding: 2em;
+    border:1px solid #000;
+    width: fit-content;
+}
+
+#agendamentos{
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+#detalhes-agendamento {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    width: min(500px, 90vw);
+    background: #fff;
+    border: 1px solid #000;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    padding: 1.5em;
+}
+
+#detalhes-agendamento[hidden] {
+    display: none;
+}

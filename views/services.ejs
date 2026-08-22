@@ -1,5 +1,4 @@
-    <%- include('header-selector.ejs')%>
-
+    <%- include(partials + "/header-selector.ejs")%>
     <div>
         <h1>Serviços</h1>
         <div class="session">
@@ -15,7 +14,7 @@
                 <p>Atendente: <%=servico.funcionario.nome%></p>
                 <p>R$<%=servico.preco%></p>
                 <p>Duração aproximada: <%=servico.duracao%> min</p>
-                <a href="/api/services/<%= servico.id %>/agendamento">Agendar</a> <!-- link padronizado para rota de agendamento -->
+                <a href="/servico/<%= servico.id %>">Agendar</a> <!-- link padronizado para rota de agendamento -->
             </div>  
         <%})%>
     <%}%>

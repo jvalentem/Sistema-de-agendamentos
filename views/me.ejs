@@ -1,0 +1,88 @@
+<%- include(partials + '/header-selector.ejs')%>
+
+    <!--Visualizar seus próximos agendamentos.-->
+    <!--Cancelar um agendamento dentro das regras definidas.-->
+
+        <div id="detalhes-agendamento" hidden>
+            <h1 id="details-nome-servico"></h1>
+            <h2 id="details-nome-funcionario"></h2>
+            <h2 id="details-horario"></h2>
+            <button id="">Cancelar agendamento</button>
+        </div>
+        <section id="agendamentos">
+            <h2>Seus agendamentos:</h2>
+            <%if(userAgendamentos.length <= 0){%>
+                <h2>Nenhum agendamento!</h2>
+            <%}%>
+
+            <%userAgendamentos.forEach(agendamento => {%>
+                <div class="agendamento">
+                    <h2><%= agendamento.servico.nome %></h2>
+                    <h3>Preço: R$<%= agendamento.servico.preco%></h3>
+                    
+                    <button id="/api/agendamento/detalhar/<%= agendamento.horario.id %>">Detalhar agendamento</button>
+                </div>
+            <%})%>
+        </section>
+        <!--Consultar seu histórico de agendamentos.-->
+        <section id="historico-agendamentos"></section>
+
+
+        <script>
+            const detalharAgendamentoButtons = document.querySelectorAll('.agendamento button');
+            const detailsWindow = document.getElementById('detalhes-agendamento');
+
+            function toggleDetailsWindow(){
+                let isWindowActive = detailsWindow.hasAttribute('hidden')
+
+                if(isWindowActive){
+                    detailsWindow.removeAttribute('hidden');
+                    return;
+                }
+                detailsWindow.setAttribute('hidden', '')
+            }
+
+            function defineDetailsWindow(details){
+                // if(!detailsWindow.hasAttribute('hidden')) toggleDetailsWindow();
+
+                let nomeServico = detailsWindow.querySelector('#details-nome-servico')
+                let funcionario = detailsWindow.querySelector('#details-nome-funcionario')
+                let horario = detailsWindow.querySelector('#details-horario')
+                let botaoCancelarAgendamento = detailsWindow.querySelector('button');
+                
+                if(details){
+                    const agendamentoId = details.id
+                    
+                    nomeServico.textContent = `Nome do serviço: ${details.servico.nome}`
+                    funcionario.textContent = `Atendente: ${details.servico.funcionario.nome}`
+                    horario.textContent = `Horário: ${details.horario.hora}`
+                    botaoCancelarAgendamento.setAttribute('id',details.id)
+
+                    botaoCancelarAgendamento.onclick = ()=>{
+        
+                        fetch(`/api/agendamento/${details.id}`,{method:'DELETE'}).then(res=>{
+                            if(res.ok){
+                                window.location.reload()
+                                alert('Agendamento apagado!')
+                            }
+                        })
+                    }
+                }
+            }
+
+            detalharAgendamentoButtons.forEach(b=>{
+                const buttonId = b.getAttribute('id')
+                const agendamentoId = buttonId.substring(buttonId.lastIndexOf('/')+1);
+
+                function detalhar(){
+                    fetch(`/api/agendamento/detalhar/${agendamentoId}`,{method:'GET'})
+                    .then(res=> res.json())
+                    .then(details => defineDetailsWindow(details))
+                    .finally(toggleDetailsWindow());
+                }
+                
+                b.onclick = ()=>{detalhar()}
+            })
+        </script>
+
+<%- include(partials + '/footer.html')%>
