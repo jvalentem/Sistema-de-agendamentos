@@ -1,7 +1,7 @@
 const data = require('../data/databaseModel');
 
 class UserService{
-    static validateUser(nome,senha){
+    static async validateUser(nome,senha){
         if(!nome || !senha) return false;
 
         const user = data.usuarios.find(u => u.nome === nome && u.senha === senha);
@@ -10,7 +10,7 @@ class UserService{
 
     }
 
-    static getUserAgendamentos(userId){
+    static async getUserAgendamentos(userId){
         const isUserZero = userId === 0;
         if(!userId && !isUserZero) return false;
         const userAgendamentos = data.agendamentos.filter(a => a.clienteId === Number(userId) && a.status == 'Em andamento' );
@@ -18,7 +18,7 @@ class UserService{
         return userAgendamentos || [];
     }
 
-    static getUserById(id){
+    static async getUserById(id){
         if(!id) return false;
 
         const user = data.usuarios.find(u => u.id === Number(id));

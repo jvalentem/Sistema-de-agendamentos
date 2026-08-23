@@ -14,7 +14,7 @@ router.get('/:serviceId',(req,res)=>{
     res.render('single-service', {servico})
 })
 
-router.post('/agendar/:sid',(req,res)=>{
+router.post('/agendar/:sid', async (req,res)=>{
     const sid = req.params.sid;
     if(!sid || !req.session.user) return res.redirect('/');
 
@@ -25,7 +25,7 @@ router.post('/agendar/:sid',(req,res)=>{
 
     if(horario.isOcupado()) return res.status(401).json({error_message:'Este horário ja está ocupado!'});
 
-    const agendamento = AgendamentoService.createAgendamento(servico,horario,clienteId);
+    const agendamento = await AgendamentoService.createAgendamento(servico,horario,clienteId);
     if(!agendamento) return res.json({error_message:'Erro ao criar agendamento'});
 
     agendamentos.push(agendamento);

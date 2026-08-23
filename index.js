@@ -1,6 +1,6 @@
 //Routers
 const agendamentoRouter = require('./routes/agendamentos')
-const usuarioRouter = require('./routes/usuario')
+const usuarioRouter = require('./routes/usuario');
 const servicosRouter = require('./routes/servicos');
 
 const data = require('./data/databaseModel')
@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/agendamento', agendamentoRouter);
-app.use('/usuario', usuarioRouter)
+app.use('/usuario', usuarioRouter);
 app.use('/servico',servicosRouter);
 app.use(express.static('public')) //arquivos estáticos
 
