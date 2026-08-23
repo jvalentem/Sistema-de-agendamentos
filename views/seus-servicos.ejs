@@ -1,0 +1,14 @@
+<%- include(partials + '/header-selector.ejs')%>
+<h2>Seus serviços: </h2>
+<%servicos.forEach(s =>{%>
+
+    <div class="servico-box">
+        <h4><%=s.nome%></h4>
+        <p>Atendente: <%=s.funcionario.nome%></p>
+        <p>R$<%=s.preco%></p>
+        <p>Duração aproximada: <%=s.duracao%> min</p>
+        <button id=<%= s.id%> class="editar-servico">Editar</button>
+        <button id=<%= s.id%> class="apagar-servico">Apagar</button>
+    </div>  
+
+<%})%>

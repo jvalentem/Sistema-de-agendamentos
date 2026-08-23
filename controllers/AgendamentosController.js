@@ -10,7 +10,6 @@ class AgendamentosController{
             if(!currentUser) return res.status(404).json({error_message:'O usuário da sessão não foi encontrado no banco de dados!'});
 
             const userAcesso = currentUser.getAcesso();
-            console.log(userAcesso)
 
             const userId = currentUser.getId();
     

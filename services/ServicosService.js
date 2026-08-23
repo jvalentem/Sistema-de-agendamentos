@@ -1,12 +1,22 @@
 const data = require('../data/databaseModel')
 
 class ServicosService{
-    static getServiceById(id){
+    static async getServiceById(id){
         const servico = data.servicos.find(s => s.id === Number(id));
         return servico || false;
     }
 
-    static getServiceBySID(sid){
+    static async getServicos(sessionId){
+        //O id do admin é 0 e !0 = true
+        const userZero = sessionId === 0;
+        if(!sessionId && !userZero) return false;
+        //Previne que um funcionario, ao logar no sistema,
+        //agende um horário com o próprio serviço
+        const servicos = data.servicos.filter(s => s.getFuncionario().getId() !== Number(sessionId));;
+        console.log('servicos carregados: ', servicos)
+        return servicos || false;
+    }
+    static async getServiceBySID(sid){
         if(!sid || typeof(sid) !== 'string') return false; 
 
         const match = sid.match(/^sid-(.)at\d+$/);
@@ -19,7 +29,7 @@ class ServicosService{
 
     }
 
-    static getHorarioBySID(sid){
+    static async getHorarioBySID(sid){
         const servico = this.getServiceBySID(sid);
         if(!servico) return false;
 

@@ -2,11 +2,12 @@
 const agendamentoRouter = require('./routes/agendamentos')
 const usuarioRouter = require('./routes/usuario');
 const servicosRouter = require('./routes/servicos');
+const funcionariosRouter = require('./routes/funcionarios')
+//Controllers
+const {ServicosController} = require('./controllers/ServicosController');
 
 const data = require('./data/databaseModel')
 const path = require('path')
-
-
 const bodyParser = require('body-parser')
 const express = require('express');
 const session = require('express-session');
@@ -41,16 +42,12 @@ app.use((req, res, next) => {
 app.use('/agendamento', agendamentoRouter);
 app.use('/usuario', usuarioRouter);
 app.use('/servico',servicosRouter);
+app.use('/funcionario', funcionariosRouter)
 app.use(express.static('public')) //arquivos estáticos
 
 
 app.listen(3000,()=>{console.log('server online')})
 
 
-app.get('/',(req,res)=>{
-    if(!req.session.user) return res.render('login')
-    const servicos = data.servicos;
-
-    res.render('services',{servicos});
-})
+app.get('/',ServicosController.getServicos)
 

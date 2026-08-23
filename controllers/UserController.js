@@ -37,7 +37,6 @@ class UserController{
         if(!usuario) return res.status(404).json({error_message:'Usuario nao encontrado em nosso banco!'});
 
         const userAgendamentos = await UserService.getUserAgendamentos(usuario.id)
-        console.log(userAgendamentos)
         return res.render('me',{userAgendamentos})
     }
 }

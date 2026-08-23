@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%=servico.nome%></title>
-</head>
-
-<body>
+<%- include(partials + '/header-selector.ejs')%>
     <h1><%=servico.nome%></h1>
     <div class="horarios">
         <h2>Horários Disponíveis:</h2>
@@ -32,7 +24,6 @@
                 if(!sid) return false; 
 
                 b.onclick = ()=>{
-                    console.log('click')
                     fetch(`/servico/agendar/${sid}`,{method:'POST'}).then(res =>{
                         if(!res.ok) return res.json().then(details => console.log(details.error_message))
 

@@ -60,7 +60,6 @@
                     botaoCancelarAgendamento.onclick = ()=>{
                         if(!window.confirm('Tem certeza que deseja cancelar esse agendamento?')) return
                         fetch(`/agendamento/detalhar/${details.id}/cancelar`,{method:'DELETE'}).then(res=>{
-                            console.log('oii')
                             if(!res.ok) return res.json().then(details => console.log(details.error_message));
 
                             window.location.reload()

@@ -23,7 +23,6 @@ class AgendamentoService{
     static async cancelarAgendamento(sid){
         const agendamento = await this.getOngoingAgendamentoBySID(sid);
         if(!agendamento) return false;
-        console.log(agendamento)
         const horarioId = agendamento.getId(); //o id do horario é o mesmo do agendamento
         const horario = ServicosService.getHorarioBySID(sid);
         agendamento.setStatus('Cancelado');
