@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const {UserService} = require('../services/UserService');
 const {UserController} = require('../controllers/UserController')
 
 router.get('/me',UserController.getAgendamentos)
