@@ -14,6 +14,8 @@ const admin = new UsuarioModel('admin','123','admin');
 const funcionario = new UsuarioModel('funcionario','123','funcionario')
 const cliente = new UsuarioModel('cliente','123');
 
+const invasor = new UsuarioModel('invasor','123');
+
 admin.setId(usuarios.length);
 usuarios.push(admin)
 
@@ -22,6 +24,9 @@ usuarios.push(funcionario)
 
 cliente.setId(usuarios.length);
 usuarios.push(cliente)
+
+invasor.setId(usuarios.length);
+usuarios.push(invasor)
 
 
 //SERVICOS, HORARIOS

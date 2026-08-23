@@ -5,9 +5,7 @@ const {UserService} = require('../services/UserService');
 
 router.get('/me',(req,res)=>{
     if(!req.session.user) return res.redirect('/');
-    console.log(req.session.user);
     const userAgendamentos = UserService.getUserAgendamentos(req.session.user.id);
-    console.log(userAgendamentos)
     res.render('me',{userAgendamentos})
 })
 

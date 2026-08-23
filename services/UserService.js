@@ -13,10 +13,17 @@ class UserService{
     static getUserAgendamentos(userId){
         const isUserZero = userId === 0;
         if(!userId && !isUserZero) return false;
-
-        const userAgendamentos = data.agendamentos.filter(a => a.horario.clienteId === Number(userId));
+        const userAgendamentos = data.agendamentos.filter(a => a.clienteId === Number(userId) && a.status == 'Em andamento' );
 
         return userAgendamentos || [];
+    }
+
+    static getUserById(id){
+        if(!id) return false;
+
+        const user = data.usuarios.find(u => u.id === Number(id));
+        
+        return user || false;
     }
 }
 

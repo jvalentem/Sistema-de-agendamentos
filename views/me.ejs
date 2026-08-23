@@ -20,7 +20,7 @@
                     <h2><%= agendamento.servico.nome %></h2>
                     <h3>Preço: R$<%= agendamento.servico.preco%></h3>
                     
-                    <button id="/api/agendamento/detalhar/<%= agendamento.horario.id %>">Detalhar agendamento</button>
+                    <button id="agendamento/detalhar/<%= agendamento.getId() %>">Detalhar agendamento</button>
                 </div>
             <%})%>
         </section>
@@ -49,22 +49,21 @@
                 let funcionario = detailsWindow.querySelector('#details-nome-funcionario')
                 let horario = detailsWindow.querySelector('#details-horario')
                 let botaoCancelarAgendamento = detailsWindow.querySelector('button');
-                
                 if(details){
                     const agendamentoId = details.id
                     
                     nomeServico.textContent = `Nome do serviço: ${details.servico.nome}`
                     funcionario.textContent = `Atendente: ${details.servico.funcionario.nome}`
-                    horario.textContent = `Horário: ${details.horario.hora}`
+                    horario.textContent = `Horário: ${details.hora}`
                     botaoCancelarAgendamento.setAttribute('id',details.id)
 
                     botaoCancelarAgendamento.onclick = ()=>{
-        
-                        fetch(`/api/agendamento/${details.id}`,{method:'DELETE'}).then(res=>{
-                            if(res.ok){
-                                window.location.reload()
-                                alert('Agendamento apagado!')
-                            }
+                        if(!window.confirm('Tem certeza que deseja cancelar esse agendamento?')) return
+                        fetch(`/agendamento/detalhar/${details.id}/cancelar`,{method:'DELETE'}).then(res=>{
+                            console.log('oii')
+                            if(!res.ok) return res.json().then(details => console.log(details.error_message));
+
+                            window.location.reload()
                         })
                     }
                 }
@@ -75,7 +74,7 @@
                 const agendamentoId = buttonId.substring(buttonId.lastIndexOf('/')+1);
 
                 function detalhar(){
-                    fetch(`/api/agendamento/detalhar/${agendamentoId}`,{method:'GET'})
+                    fetch(`/agendamento/detalhar/${agendamentoId}`,{method:'GET'})
                     .then(res=> res.json())
                     .then(details => defineDetailsWindow(details))
                     .finally(toggleDetailsWindow());

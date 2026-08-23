@@ -2,7 +2,7 @@ class Horario{
     constructor(hora,serviceId){
         this.hora = hora;
         this.id = this.generateId(serviceId); //necessário um id diferenciado para o cliente poder acessar o serviço pelo link
-        this.clienteId = null;
+        this.ocupado = false;
     }
 
     generateId(serviceId){
@@ -10,10 +10,10 @@ class Horario{
     }
 
     setHora(hora){this.hora = hora}
-    setCliente(clienteId){this.clienteId = clienteId}
+    setOcupado(ocupado){this.ocupado = ocupado}
 
     getId(){return this.id}
-    getClienteId(){return this.clienteId}
+    isOcupado(){return this.ocupado}
     getHora(){return this.hora}
 }
 

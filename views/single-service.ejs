@@ -10,11 +10,11 @@
     <h1><%=servico.nome%></h1>
     <div class="horarios">
         <h2>Horários Disponíveis:</h2>
-        <% if(servico.horarios.every(horario => horario.clienteId != null)){%>
+        <% if(servico.horarios.every(horario => horario.isOcupado())){%>
             <h3>Nenhum horário disponível para esse serviço!</h3>
         <%}%>
         <%servico.horarios.forEach(horario=>{%>
-            <%if(horario.clienteId == null){%>
+            <%if(horario.ocupado == false){%>
                 <div class="horario">
                     <p><%=horario.hora%></p>
                     <button id=<%= `${horario.id}`%> class="agendamentoButton">Agende nesse horário</button> <!-- fetch no js -->
@@ -32,9 +32,14 @@
                 if(!sid) return false; 
 
                 b.onclick = ()=>{
-                    fetch(`/servico/agendar/${sid}`,{method:'POST'})
-                    // .then(res.json())
-                    // .then(details=>{console.log(details)})
+                    console.log('click')
+                    fetch(`/servico/agendar/${sid}`,{method:'POST'}).then(res =>{
+                        if(!res.ok) return res.json().then(details => console.log(details.error_message))
+
+                        return res.json();
+                    }).then(details =>{
+                        window.location.href = details.redirectTo;
+                    })
                 }
             })
         }

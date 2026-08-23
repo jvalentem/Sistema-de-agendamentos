@@ -1,14 +1,15 @@
 class Agendamento{
     constructor(servico,horario,clienteId){
         this.servico = servico;
-        this.horario = horario;
-        this.id = horario.getId()
-        this.horario.clienteId = clienteId;
+        this.id = horario.getId() //o id do agendamento vai ser o mesmo id do horario
+        this.hora = horario.hora;
+        // this.horario.clienteId = clienteId;
+        this.clienteId = clienteId
         this.status = 'Em andamento'
     }
 
     getServico(){return this.servico}
-    getHorario(){return this.horario}
+    getClienteId(){return this.clienteId}
     getId(){return this.id}
     getStatus(){return this.status}
 

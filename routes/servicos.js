@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {ServicosService} = require('../services/ServicosService');
 const {AgendamentoService} = require('../services/AgendamentoServices');
-const { agendamentos } = require('../data/databaseModel');
+const { agendamentos, servicos } = require('../data/databaseModel');
 
 router.get('/:serviceId',(req,res)=>{
     const serviceId = req.params.serviceId;
@@ -17,16 +17,19 @@ router.get('/:serviceId',(req,res)=>{
 router.post('/agendar/:sid',(req,res)=>{
     const sid = req.params.sid;
     if(!sid || !req.session.user) return res.redirect('/');
+
+
     const servico = ServicosService.getServiceBySID(sid);
     const horario = ServicosService.getHorarioBySID(sid);
     const clienteId = req.session.user.id;
 
+    if(horario.isOcupado()) return res.status(401).json({error_message:'Este horário ja está ocupado!'});
 
     const agendamento = AgendamentoService.createAgendamento(servico,horario,clienteId);
-    if(!agendamento) return res.status().json({error_message:'Erro ao criar agendamento'});
+    if(!agendamento) return res.json({error_message:'Erro ao criar agendamento'});
 
     agendamentos.push(agendamento);
-    console.log(agendamentos)
+    return res.json({'redirectTo':'/usuario/me'});
 })
 
 module.exports = router
