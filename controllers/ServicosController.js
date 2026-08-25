@@ -1,4 +1,5 @@
 const {ServicosService} = require('../services/ServicosService');
+const {AgendamentoService} = require('../services/AgendamentoServices')
 
 class ServicosController{
 
@@ -39,8 +40,7 @@ class ServicosController{
         const agendamento = await AgendamentoService.createAgendamento(servico,horario,clienteId);
         if(!agendamento) return res.json({error_message:'Erro ao criar agendamento'});
 
-        agendamentos.push(agendamento);
-
+        
         return res.json({'redirectTo':'/usuario/me'});
     }
 

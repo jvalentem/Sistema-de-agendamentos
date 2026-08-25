@@ -16,6 +16,9 @@ class Agendamento{
     setStatus(status){this.status = status}
     setServico(servico){this.servico = servico}
     setHorario(horario){this.horario = horario}
+    //Necessário pois o banco permite armazenar varios agendamentos cancelados
+    //Com o mesmo id, então é preciso diferenciar
+    setId(id){this.id = id}
 }
 
 module.exports = Agendamento

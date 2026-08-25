@@ -13,7 +13,6 @@ class ServicosService{
         //Previne que um funcionario, ao logar no sistema,
         //agende um horário com o próprio serviço
         const servicos = data.servicos.filter(s => s.getFuncionario().getId() !== Number(sessionId));;
-        console.log('servicos carregados: ', servicos)
         return servicos || false;
     }
     static async getServiceBySID(sid){
@@ -30,9 +29,8 @@ class ServicosService{
     }
 
     static async getHorarioBySID(sid){
-        const servico = this.getServiceBySID(sid);
+        const servico = await this.getServiceBySID(sid);
         if(!servico) return false;
-
         const horario = servico.horarios.find(h => h.id === sid);
 
         return horario || false;

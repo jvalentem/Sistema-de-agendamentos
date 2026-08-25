@@ -4,6 +4,7 @@ const {UserService} = require('../services/UserService');
 class AgendamentosController{
     static async detalhar(req,res){
         try{
+            console.log('entrou na rota')
             if(!req.session.user) return res.redirect('/');
             const session = req.session;
             const currentUser = await UserService.getUserById(session.user.id);
@@ -14,7 +15,7 @@ class AgendamentosController{
             const userId = currentUser.getId();
     
             const agendamentoid = req.params.id;
-            const agendamento = await AgendamentoService.getOngoingAgendamentoBySID(agendamentoid);
+            const agendamento = await AgendamentoService.getAgendamentoBySID(agendamentoid);
 
             if(!agendamento) return res.status(404).json({error_message:'Agendamento não encontrado'});
 
@@ -35,17 +36,16 @@ class AgendamentosController{
     static async cancelar(req,res){
         try{
             if(!req.session.user) return res.redirect('/');
-        
+
             const currentUser = await UserService.getUserById(req.session.user.id);
         
             if(!currentUser) return res.status(404).json({error_message:'Não foi possivel localizar o usuario da sessão em nosso banco'});
-        
+
             const userAcess = currentUser.getAcesso();
             const userId = currentUser.getId();
-            const agendamento = await AgendamentoService.getOngoingAgendamentoBySID(req.params.sid);
-        
+            const agendamento = await AgendamentoService.getAgendamentoBySID(req.params.sid);
+
             if(!agendamento) return res.status(404).json({error_message:'agendamento não encontrado'})
-            
             const agendamentoCliente = agendamento.getClienteId();
             const agendamentoFuncionario = agendamento.getServico().getFuncionario().getId();
             
@@ -53,9 +53,9 @@ class AgendamentosController{
             if(!(userAcess == 'admin'|| 
                 userId == agendamentoCliente || 
                 userId == agendamentoFuncionario)) return res.status(403).json({error_message:'acesso negado!'})
-        
-            await AgendamentoService.cancelarAgendamento(req.params.sid);
-            return res.status(201).json();
+            const cancelado = await AgendamentoService.cancelarAgendamento(req.params.sid);
+            
+            return res.status(201).json({});
         }catch(e){
             return res.status(400).json({error_message:e});
         }
@@ -65,7 +65,7 @@ class AgendamentosController{
         try{
             if(!req.session.user) return res.redirect('/')
 
-        const agendamento = await AgendamentoService.getOngoingAgendamentoBySID(req.params.sid);
+        const agendamento = await AgendamentoService.getAgendamentoBySID(req.params.sid);
         const currentUser = await UserService.getUserById(req.session.user.id);
         if(!currentUser) return res.redirect('/');
         if(!agendamento) return res.status(404).json({error_message:'Agendamento não encontrado'})

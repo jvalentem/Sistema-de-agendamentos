@@ -1,0 +1,70 @@
+<%- include(partials + '/header-selector.ejs')%>
+
+    <div id="detalhes-agendamento" hidden>
+            <h1 id="details-nome-servico"></h1>
+            <h2 id="details-nome-funcionario"></h2>
+            <h2 id="details-horario"></h2>
+            <button id="">Cancelar agendamento</button>
+        </div>
+        <h1>Sua Agenda:</h1>
+        <%if(agendamentos.length <= 0){%>
+            <p>Nenhum agendamento no momento!</p>
+        <%}%>
+    <%agendamentos.forEach(a =>{%>
+        <div class="agendamento">
+            <p>Serviço: <%= a.servico.nome%></p>
+            <p>Horário: <%= a.hora%></p>
+            <p>Status: <%= a.status%></p>
+            <button id=<%= 'detalhar-' + a.id %> class="detalhar">Detalhar</button>
+
+            <%if(a.status !== 'Cancelado'){%>
+                <button id=<%= 'cancelar-' + a.id%> class="cancelar">Cancelar</button>
+            <%}%>
+        </div>    
+    <%})%>
+
+
+    <script>
+        const cancelarButtons = document.querySelectorAll('button.cancelar');
+        const detalharButtons = document.querySelectorAll('button.detalhar');
+
+
+        function requestCancelling(id){
+            if(!id) return false;
+            fetch(`/agendamento/detalhar/${id}/cancelar`,{method:'DELETE'})
+            .then(res=>{
+                if(res.ok){
+                    window.location.reload();
+                    return alert('Agendamento apagado com sucesso!')
+                }
+            
+            }).catch(e =>{alert('Nao foi possivel apagar o agendamento')})
+        }
+
+        function requestDetails(id){
+            if(!id) return false;
+            fetch(`/agendamento/detalhar/${id}`,{method:'GET'}).then(res=>{
+                return res.json()
+            }).then(details =>{
+                console.log(details)
+            })
+        }
+
+
+
+        cancelarButtons.forEach(b => {
+            let agendamentoId = b.getAttribute('id');
+            agendamentoId = agendamentoId.substring(9)
+            
+            b.onclick = ()=>{requestCancelling(agendamentoId)}
+        })
+        
+        detalharButtons.forEach(b => {
+            let agendamentoId = b.getAttribute('id');
+            agendamentoId = agendamentoId.substring(9)
+
+            b.onclick = ()=>{requestDetails(agendamentoId)}
+        })
+    </script>
+    </body>
+</html>

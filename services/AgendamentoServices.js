@@ -4,29 +4,35 @@ const { ServicosService } = require('./ServicosService');
 
 class AgendamentoService{
 
-    
-    static async getCancelledAgendamentoBySID(sid){
-        const agendamento = data.agendamentos.find(a => a.id === sid && a.status == 'Cancelado');
+    static async getAgendamentoBySID(sid){
+        const agendamento = data.agendamentos.find(a => a.id === sid)
 
         return agendamento || false;
     }
-    //Quando o usuário cancela o agendamento, ele permanece no banco de dados com o mesmo SID,
-    //então, quando uso o metodo find(s => a.id == sid), ele retorna o primeiro resultado que ele encontrar
-    //esteja ele cancelado ou não, podendo levar a resultados indesejados
-    static async getOngoingAgendamentoBySID(sid){
-        const agendamento = data.agendamentos.find(a => a.id === sid && a.status == 'Em andamento')
 
-        return agendamento || false;
+    static async howManyCancelled(id){
+        if(!id || typeof(id) !== 'string') return false;
 
+        const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const cancelledIdPattern = new RegExp(`^${escapedId}-cancelled\\d+$`);
+
+        return data.agendamentos.filter(a =>
+            a.status === 'Cancelado' && cancelledIdPattern.test(a.id)
+        ).length;
     }
-
     static async cancelarAgendamento(sid){
-        const agendamento = await this.getOngoingAgendamentoBySID(sid);
+        const agendamento = await this.getAgendamentoBySID(sid);
         if(!agendamento) return false;
-        const horarioId = agendamento.getId(); //o id do horario é o mesmo do agendamento
-        const horario = ServicosService.getHorarioBySID(sid);
+
+        const horario = await ServicosService.getHorarioBySID(sid);
+        if(!horario) return false;
+        
+        const cancelIndex = await this.howManyCancelled(sid) + 1;
         agendamento.setStatus('Cancelado');
+        agendamento.setId(`${sid}-cancelled${cancelIndex}`);
         horario.setOcupado(false);
+        console.log(data.agendamentos)
+        return true;
     }
 
     static async deleteAgendamento(sid){
@@ -44,7 +50,9 @@ class AgendamentoService{
         const agendamento = new AgendamentoModel(servico,horario,clienteId);
         horario.setOcupado(true);
 
-        return agendamento || false;
+        data.agendamentos.push(agendamento);
+        
+        return true;
     }
 }
 

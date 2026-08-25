@@ -11,7 +11,13 @@ class FuncionarioService{
 
         const servicosFuncionario = data.servicos.filter(s => s.getFuncionario().getId() === Number(id));
         return servicosFuncionario || false;
+    }
+    static async getFuncionarioAgenda(id){
+        const funcionario = await this.getFuncionarioById(id);
+        if(!funcionario) return false;
+        const agendamentos = data.agendamentos.filter(a => a.servico.funcionario.id === Number(id));
 
+        return agendamentos || false;
     }
 }
 
