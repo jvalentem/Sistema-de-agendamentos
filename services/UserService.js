@@ -1,6 +1,7 @@
 const data = require('../data/databaseModel');
 
 class UserService{
+
     static async validateUser(nome,senha){
         if(!nome || !senha) return false;
 
@@ -19,7 +20,6 @@ class UserService{
     }
 
     static async getUserById(id){
-        //adminId = 0
         const userZero = id === 0;
         if(!id && !userZero) return false;
 

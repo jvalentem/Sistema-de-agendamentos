@@ -3,9 +3,13 @@ const router = express.Router();
 const {ServicosController} = require('../controllers/ServicosController');
 const {AgendamentoService} = require('../services/AgendamentoServices');
 const { agendamentos, servicos } = require('../data/databaseModel');
+const {sessionActive} = require('../middlewares/sessionActive')
+
+//usa esse middleware em todas as rotas
+router.use(sessionActive()) 
 
 router.get('/:serviceId',ServicosController.getServiceById);
 
-router.post('/agendar/:sid', ServicosController.agendarServico);
+router.post('/agendar/:sid',  ServicosController.agendarServico);
 
 module.exports = router

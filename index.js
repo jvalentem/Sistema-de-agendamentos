@@ -46,7 +46,7 @@ app.use('/funcionario', funcionariosRouter)
 app.use(express.static('public')) //arquivos estáticos
 
 
-app.listen(3000,()=>{console.log('server online')})
+app.listen(3000)
 
 
 app.get('/',ServicosController.getServicos)

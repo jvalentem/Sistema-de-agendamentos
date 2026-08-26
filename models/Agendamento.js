@@ -5,11 +5,13 @@ class Agendamento{
         this.hora = horario.hora;
         // this.horario.clienteId = clienteId;
         this.clienteId = clienteId
+        this.funcionarioId = servico.funcionario.getId()
         this.status = 'Em andamento'
     }
 
     getServico(){return this.servico}
     getClienteId(){return this.clienteId}
+    getFuncionarioId(){return this.funcionarioId}
     getId(){return this.id}
     getStatus(){return this.status}
 

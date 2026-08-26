@@ -34,8 +34,8 @@ class ServicosController{
 
         const servico = await ServicosService.getServiceBySID(sid);
         const horario = await ServicosService.getHorarioBySID(sid);
+        
         const clienteId = req.session.user.id;
-        console.log(clienteId)
         if(horario.isOcupado()) return res.status(401).json({error_message:'Este horário ja está ocupado!'});
 
         const agendamento = await AgendamentoService.createAgendamento(servico,horario,clienteId);

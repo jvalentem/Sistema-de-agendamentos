@@ -4,7 +4,6 @@ const {UserService} = require('../services/UserService');
 class AgendamentosController{
     static async detalhar(req,res){
         try{
-            console.log('entrou na rota')
             if(!req.session.user) return res.redirect('/');
             const session = req.session;
             const currentUser = await UserService.getUserById(session.user.id);
@@ -18,17 +17,10 @@ class AgendamentosController{
             const agendamento = await AgendamentoService.getAgendamentoBySID(agendamentoid);
 
             if(!agendamento) return res.status(404).json({error_message:'Agendamento não encontrado'});
+            const canAlter = await AgendamentoService.canAlterAgendamento(currentUser,agendamento);
 
-            const agendamentoCliente = agendamento.getClienteId();
-            const agendamentoFuncionario = agendamento.getServico().getFuncionario().getId();
-
-        //Se o usuario nao for nem admin, nem o cliente do agendamento e nem o funcionario, ele nao pode cancelar
-
-            if(!(userAcesso == 'admin' || 
-                userId == agendamentoCliente || 
-                userId == agendamentoFuncionario)) return res.status(403).json({error_message:'Acesso negado!'})
-            
-            agendamento.clienteJson = await UserService.getUserById(agendamentoCliente) //Passando as informações do cliente pro front
+            if(!canAlter) throw new Error('Acesso negado!');
+            agendamento.clienteJson = await UserService.getUserById(userId) //Passando as informações do cliente pro front
             return res.json(agendamento);
         }catch(e){
             return res.status(400).json({error_message:e});
@@ -40,25 +32,14 @@ class AgendamentosController{
 
             const currentUser = await UserService.getUserById(req.session.user.id);
         
-            if(!currentUser) return res.status(404).json({error_message:'Não foi possivel localizar o usuario da sessão em nosso banco'});
-
-            const userAcess = currentUser.getAcesso();
             const userId = currentUser.getId();
-            const agendamento = await AgendamentoService.getAgendamentoBySID(req.params.sid);
-
-            if(!agendamento) return res.status(404).json({error_message:'agendamento não encontrado'})
-            const agendamentoCliente = agendamento.getClienteId();
-            const agendamentoFuncionario = agendamento.getServico().getFuncionario().getId();
-            
+            const agendamentoId = req.params.sid;
             //Se o usuario nao for nem admin, nem o cliente do agendamento e nem o funcionario, ele nao pode cancelar
-            if(!(userAcess == 'admin'|| 
-                userId == agendamentoCliente || 
-                userId == agendamentoFuncionario)) return res.status(403).json({error_message:'acesso negado!'})
-            const cancelado = await AgendamentoService.cancelarAgendamento(req.params.sid);
+            await AgendamentoService.cancelarAgendamento(agendamentoId,currentUser);
             
             return res.status(201).json({});
         }catch(e){
-            return res.status(400).json({error_message:e});
+            return res.send('Erro: ', e);
         }
     }
 
@@ -66,19 +47,9 @@ class AgendamentosController{
         try{
             if(!req.session.user) return res.redirect('/')
 
-        const agendamento = await AgendamentoService.getAgendamentoBySID(req.params.sid);
-        const currentUser = await UserService.getUserById(req.session.user.id);
-        if(!currentUser) return res.redirect('/');
-        if(!agendamento) return res.status(404).json({error_message:'Agendamento não encontrado'})
+            const agendamento = await AgendamentoService.getAgendamentoBySID(req.params.sid);
 
-        const userAcess = currentUser.getAcesso();
-        const userId = currentUser.getId();
-
-        const funcionarioId = agendamento.getServico().getFuncionario().getId();
-
-        //Somente os admins podem apagar os registros de agendamentos (brevemente tera um sistema automatico)
-        if(!userAcess == 'admin') return res.status(403).json({error_message:'Acesso negado!'})
-        
+            //Somente os admins podem apagar os registros de agendamentos (brevemente tera um sistema automatico)        
             await AgendamentoService.deleteAgendamento(agendamento.getId());
         }catch(e){
             return res.status(400).json({error_message:e});

@@ -44,7 +44,7 @@
 
             function defineDetailsWindow(details){
                 // if(!detailsWindow.hasAttribute('hidden')) toggleDetailsWindow();
-
+                console.log(details)
                 let nomeServico = detailsWindow.querySelector('#details-nome-servico')
                 let funcionario = detailsWindow.querySelector('#details-nome-funcionario')
                 let horario = detailsWindow.querySelector('#details-horario')
@@ -74,7 +74,9 @@
 
                 function detalhar(){
                     fetch(`/agendamento/detalhar/${agendamentoId}`,{method:'GET'})
-                    .then(res=> res.json())
+                    .then(res=> {
+                        if(res.ok) return res.json()
+                    })
                     .then(details => defineDetailsWindow(details))
                     .finally(toggleDetailsWindow());
                 }
