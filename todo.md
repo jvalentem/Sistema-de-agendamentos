@@ -1,2 +1,0 @@
-- Front end
-- Conexão com o banco
