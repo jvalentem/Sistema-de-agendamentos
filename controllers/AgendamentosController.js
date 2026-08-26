@@ -27,7 +27,8 @@ class AgendamentosController{
             if(!(userAcesso == 'admin' || 
                 userId == agendamentoCliente || 
                 userId == agendamentoFuncionario)) return res.status(403).json({error_message:'Acesso negado!'})
-
+            
+            agendamento.clienteJson = await UserService.getUserById(agendamentoCliente) //Passando as informações do cliente pro front
             return res.json(agendamento);
         }catch(e){
             return res.status(400).json({error_message:e});

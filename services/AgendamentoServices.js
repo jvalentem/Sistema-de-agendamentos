@@ -45,7 +45,9 @@ class AgendamentoService{
     }
 
     static async createAgendamento(servico,horario,clienteId){
-        if(!servico || !horario || !clienteId) return false;
+        //Novamente, o id do admin é 0
+        const userZero = clienteId === 0;
+        if(!servico || !horario || (!clienteId && !userZero)) return false;
 
         const agendamento = new AgendamentoModel(servico,horario,clienteId);
         horario.setOcupado(true);

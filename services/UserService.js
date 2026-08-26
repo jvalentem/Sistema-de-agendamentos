@@ -19,7 +19,9 @@ class UserService{
     }
 
     static async getUserById(id){
-        if(!id) return false;
+        //adminId = 0
+        const userZero = id === 0;
+        if(!id && !userZero) return false;
 
         const user = data.usuarios.find(u => u.id === Number(id));
         

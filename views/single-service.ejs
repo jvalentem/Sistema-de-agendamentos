@@ -26,7 +26,7 @@
                 b.onclick = ()=>{
                     fetch(`/servico/agendar/${sid}`,{method:'POST'}).then(res =>{
                         if(!res.ok) return res.json().then(details => console.log(details.error_message))
-
+                        
                         return res.json();
                     }).then(details =>{
                         window.location.href = details.redirectTo;
