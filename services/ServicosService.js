@@ -1,6 +1,13 @@
 const data = require('../data/databaseModel')
-
+const Servico = require('../models/Servico');
+const { FuncionarioService } = require('./FuncionarioService');
 class ServicosService{
+
+    static async createService(servico){
+        // const servico = new Servico('serviço','funcionario',[],45,45)
+
+        data.servicos.push(servico);
+    }
     static async getServiceById(id){
         const servico = data.servicos.find(s => s.id === Number(id));
         return servico || false;
@@ -12,17 +19,14 @@ class ServicosService{
         if(!sessionId && !userZero) return false;
         //Previne que um funcionario, ao logar no sistema,
         //agende um horário com o próprio serviço
-        const servicos = data.servicos.filter(s => s.getFuncionario().getId() !== Number(sessionId));;
+        const servicos = data.servicos.filter(s => s.funcionarioId !== Number(sessionId));;
+        servicos.forEach(async s=> s.funcionario = await FuncionarioService.getFuncionarioById(s.funcionarioId));
+
         return servicos || false;
     }
     static async getServiceBySID(sid){
-        if(!sid || typeof(sid) !== 'string') return false; 
-
-        const match = sid.match(/^sid-(.)at\d+$/);
-        const serviceId = match? match[1] : false;
-        if(!serviceId) return false;
-
-        const servico = data.servicos.find(s => s.id === Number(serviceId));
+        
+        const servico = data.servicos.find(s => s.id === Number(sid));
         
         return servico || false;
 
@@ -31,8 +35,10 @@ class ServicosService{
     static async getHorarioBySID(sid){
         const servico = await this.getServiceBySID(sid);
         if(!servico) return false;
-        const horario = servico.horarios.find(h => h.id === sid);
 
+        //select * from horarios where idServico = sid
+
+        const horario = data.horarios.find(h => h.servicoId === Number(sid));
         return horario || false;
     }
 }

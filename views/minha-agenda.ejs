@@ -49,12 +49,13 @@
                 let cliente = detailsWindow.querySelector('#details-nome-cliente')
 
                 if(details){
+                    console.log(details.servico.nome)
                     const agendamentoId = details.id
                     
                     nomeServico.textContent = `Nome do serviço: ${details.servico.nome}`
                     funcionario.textContent = `Atendente: ${details.servico.funcionario.nome}`
                     horario.textContent = `Horário: ${details.hora}`
-                    cliente.textContent = `Cliente: ${details.clienteJson.nome}`
+                    cliente.textContent = `Cliente: ${details.cliente.nome}`
                 }
             }
 

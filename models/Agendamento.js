@@ -1,18 +1,19 @@
 class Agendamento{
     constructor(servico,horario,clienteId){
-        this.servico = servico;
-        this.id = horario.getId() //o id do agendamento vai ser o mesmo id do horario
+        this.servicoId = servico.id;
+        this.horarioid = horario.id;
         this.hora = horario.hora;
-        // this.horario.clienteId = clienteId;
         this.clienteId = clienteId
-        this.funcionarioId = servico.funcionario.getId()
-        this.status = 'Em andamento'
+        this.funcionarioId = servico.funcionario.id
+        this.status = 'Em andamento' //status varchar(255) default 'Em andamento'
     }
 
-    getServico(){return this.servico}
+    getServicoId(){return this.servicoId}
     getClienteId(){return this.clienteId}
     getFuncionarioId(){return this.funcionarioId}
+    getHorarioId(){return this.horarioid}
     getId(){return this.id}
+
     getStatus(){return this.status}
 
     setStatus(status){this.status = status}

@@ -6,7 +6,7 @@ const Agendamento = require('../models/Agendamento')
 const usuarios = []
 const servicos = []
 const agendamentos = []
-
+const horarios = []
 //Inicialização dos modelos de teste
 
 //USUARIOS
@@ -30,19 +30,21 @@ usuarios.push(invasor)
 
 
 //SERVICOS, HORARIOS
-const corteDeCabelo = new Servico('Cortes de cabelo',funcionario,[],45,30);
+const corteDeCabelo = new Servico('Cortes de cabelo',funcionario,45,30);
 corteDeCabelo.setId(servicos.length + 1);
 
-const horariosCorte = [new Horario('15:00',corteDeCabelo.getId())];
-corteDeCabelo.setHorarios(horariosCorte);
+const horarioCorte = new Horario('15:00',corteDeCabelo.getId());
 servicos.push(corteDeCabelo);
+horarioCorte.setId(horarios.length + 1)
+horarios.push(horarioCorte)
 
-const psicologia = new Servico('Psicologia',funcionario,[],70,50);
+const psicologia = new Servico('Psicologia',funcionario,70,50);
 psicologia.setId(servicos.length + 1)
 
-const horariosPsicologa = [new Horario('16:50',psicologia.getId()), new Horario('17:30',psicologia.getId())];
-psicologia.setHorarios(horariosPsicologa);
+const horarioPsicologa = new Horario('16:50',psicologia.getId())
+horarioPsicologa.setId(horarios.length + 1)
 servicos.push(psicologia)
+horarios.push(horarioPsicologa)
 
 // //AGENDAMENTOS 
 
@@ -52,4 +54,4 @@ servicos.push(psicologia)
 // const agendamentoPsicologia = new Agendamento(psicologia,horariosPsicologa[1],cliente.id);
 // agendamentos.push(agendamentoPsicologia)
 
-module.exports = {usuarios,servicos,agendamentos}
+module.exports = {usuarios,servicos,agendamentos,horarios}

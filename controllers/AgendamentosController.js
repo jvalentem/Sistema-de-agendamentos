@@ -1,27 +1,28 @@
 const {AgendamentoService} = require('../services/AgendamentoServices');
 const {UserService} = require('../services/UserService');
-
+const {ServicosService} = require('../services/ServicosService')
 class AgendamentosController{
     static async detalhar(req,res){
         try{
             if(!req.session.user) return res.redirect('/');
+
             const session = req.session;
             const currentUser = await UserService.getUserById(session.user.id);
-            if(!currentUser) return res.status(404).json({error_message:'O usuário da sessão não foi encontrado no banco de dados!'});
-
-            const userAcesso = currentUser.getAcesso();
-
-            const userId = currentUser.getId();
     
             const agendamentoid = req.params.id;
-            const agendamento = await AgendamentoService.getAgendamentoBySID(agendamentoid);
-
-            if(!agendamento) return res.status(404).json({error_message:'Agendamento não encontrado'});
+            
+            //select * from agendamentos where id = agendamentoid
+            const agendamento = await AgendamentoService.getAgendamentoByID(agendamentoid);
+            if(!agendamento) throw new Error("Agendamento não encontrado");
             const canAlter = await AgendamentoService.canAlterAgendamento(currentUser,agendamento);
-
+            
+            //select * from servicos where id = servicoId
+            agendamento.servico = await ServicosService.getServiceById(agendamento.servicoId)
+            
+            //select * from users where id = clienteId
+            agendamento.cliente = await UserService.getUserById(agendamento.clienteId)
             if(!canAlter) throw new Error('Acesso negado!');
-            agendamento.clienteJson = await UserService.getUserById(userId) //Passando as informações do cliente pro front
-            return res.json(agendamento);
+            return res.json(agendamento);   
         }catch(e){
             return res.status(400).json({error_message:e});
         }
@@ -34,7 +35,7 @@ class AgendamentosController{
         
             const userId = currentUser.getId();
             const agendamentoId = req.params.sid;
-            //Se o usuario nao for nem admin, nem o cliente do agendamento e nem o funcionario, ele nao pode cancelar
+
             await AgendamentoService.cancelarAgendamento(agendamentoId,currentUser);
             
             return res.status(201).json({});
@@ -47,7 +48,7 @@ class AgendamentosController{
         try{
             if(!req.session.user) return res.redirect('/')
 
-            const agendamento = await AgendamentoService.getAgendamentoBySID(req.params.sid);
+            const agendamento = await AgendamentoService.getAgendamentoByID(req.params.sid);
 
             //Somente os admins podem apagar os registros de agendamentos (brevemente tera um sistema automatico)        
             await AgendamentoService.deleteAgendamento(agendamento.getId());
