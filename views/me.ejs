@@ -11,17 +11,19 @@
         </div>
         <section id="agendamentos">
             <h2>Seus agendamentos:</h2>
-            <%if(userAgendamentos.length <= 0){%>
+            <%if(userAgendamentos.every(a=> a.aStatus === 'Cancelado') || userAgendamentos.length <= 0){%>
                 <h2>Nenhum agendamento!</h2>
             <%}%>
 
             <%userAgendamentos.forEach(agendamento => {%>
-                <div class="agendamento">
-                    <h2><%= agendamento.servico.nome %></h2>
-                    <h3>Preço: R$<%= agendamento.servico.preco%></h3>
+                <% if(agendamento.aStatus !== "Cancelado"){ %>
+                    <div class="agendamento">
+                        <h2><%= agendamento.servico.nome %></h2>
+                        <h3>Preço: R$<%= agendamento.servico.preco%></h3>
                     
-                    <button id="agendamento/detalhar/<%= agendamento.getId() %>">Detalhar agendamento</button>
-                </div>
+                        <button id="agendamento/detalhar/<%= agendamento.id %>">Detalhar agendamento</button>
+                    </div>
+                <%}%>
             <%})%>
         </section>
         <!--Consultar seu histórico de agendamentos.-->
@@ -49,11 +51,12 @@
                 let funcionario = detailsWindow.querySelector('#details-nome-funcionario')
                 let horario = detailsWindow.querySelector('#details-horario')
                 let botaoCancelarAgendamento = detailsWindow.querySelector('button');
+
                 if(details){
                     const agendamentoId = details.id
                     console.log(details.servico)
                     nomeServico.textContent = `Nome do serviço: ${details.servico.nome}`
-                    funcionario.textContent = `Atendente: ${details.servico.funcionario.nome}`
+                    funcionario.textContent = `Atendente: ${details.funcionario.nome}`
                     horario.textContent = `Horário: ${details.hora}`
                     botaoCancelarAgendamento.setAttribute('id',details.id)
 

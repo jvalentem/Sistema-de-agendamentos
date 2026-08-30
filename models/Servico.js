@@ -12,7 +12,7 @@ class Servico{
 
     getId(){return this.id}
     getNome(){return this.nome}
-    getFuncionario(){return this.funcionario}
+    getFuncionarioId(){return this.funcionarioId}
     getHorarios(){//select * from horarios where servico = this.id
         }
 }

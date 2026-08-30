@@ -15,8 +15,7 @@ class Usuario{
     getAcesso(){return this.acesso}
     getSenha(){return this.senha}
     getNome(){return this.nome}
-    getAgendamentos(){//agendamentos.filter(a => a.cliente === this.getId())    
-    }
+    
 }
 
 

@@ -1,6 +1,5 @@
 const {UserService} = require('../services/UserService');
 
-
 class UserController{
 
 
@@ -39,6 +38,7 @@ class UserController{
         if(!usuario) return res.status(404).json({error_message:'Usuario nao encontrado em nosso banco!'});
 
         const userAgendamentos = await UserService.getUserAgendamentos(usuario.id)
+
         return res.render('me',{userAgendamentos})
     }
 }

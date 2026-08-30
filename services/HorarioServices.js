@@ -1,10 +1,10 @@
-const data = require('../data/databaseModel');
+const pool = require('../data/mysql').pool;
 const HorarioModel = require('../models/Horario') 
 class HorarioService{
     static async getHorariosFromServico(serviceId){
        //select * from horarios where servico = serviceId
        
-       const horarios = data.horarios.filter(h => h.servicoId === Number(serviceId));
+       const [horarios] = pool.query(`select * from horarios where fk_servico = ${serviceId}`);
 
        return horarios || false;
     }
