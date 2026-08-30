@@ -1,12 +1,14 @@
 
-<%if(session.user.acesso == 'cliente'){%>
-            <%-include(partials + '/header_cliente.ejs')%>
-    <%}%>
+<%if(session.user){%>
+        <%if(session.user.acesso == 'admin'){%>
+                <%-include(partials + '/header_admin.ejs')%>
+        <%}%>
     
-    <%if(session.user.acesso == 'admin'){%>
-            <%-include(partials + '/header_admin.ejs')%>
-    <%}%>
-    
-    <%if(session.user.acesso == 'funcionario'){%>
-        <%-include(partials + '/header_funcionario.ejs')%>
+        <%if(session.user.acesso == 'funcionario'){%>
+                <%-include(partials + '/header_funcionario.ejs')%>
+        <%}%>
+<%}else{%>
+        <%-include(partials + '/header_cliente.ejs')%>
 <%}%>
+    
+    

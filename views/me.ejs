@@ -46,7 +46,7 @@
 
             function defineDetailsWindow(details){
                 // if(!detailsWindow.hasAttribute('hidden')) toggleDetailsWindow();
-                console.log(details)
+
                 let nomeServico = detailsWindow.querySelector('#details-nome-servico')
                 let funcionario = detailsWindow.querySelector('#details-nome-funcionario')
                 let horario = detailsWindow.querySelector('#details-horario')
@@ -54,7 +54,7 @@
 
                 if(details){
                     const agendamentoId = details.id
-                    console.log(details.servico)
+
                     nomeServico.textContent = `Nome do serviço: ${details.servico.nome}`
                     funcionario.textContent = `Atendente: ${details.funcionario.nome}`
                     horario.textContent = `Horário: ${details.hora}`
@@ -63,7 +63,7 @@
                     botaoCancelarAgendamento.onclick = ()=>{
                         if(!window.confirm('Tem certeza que deseja cancelar esse agendamento?')) return
                         fetch(`/agendamento/detalhar/${agendamentoId}/cancelar`,{method:'DELETE'}).then(res=>{
-                            if(!res.ok) return res.json().then(details => console.log(details));
+                            if(!res.ok) return res.json()
 
                             window.location.reload()
                         })

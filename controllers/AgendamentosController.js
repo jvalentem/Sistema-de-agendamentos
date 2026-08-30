@@ -5,7 +5,6 @@ class AgendamentosController{
     static async detalhar(req,res){
 
         try{
-            if(!req.session.user) return res.redirect('/');
             const session = req.session;
             const currentUser = await UserService.getUserById(session.user.id);
             
@@ -25,7 +24,7 @@ class AgendamentosController{
             agendamento.funcionario = await UserService.getUserById(agendamento.fk_funcionario);
 
             if(!canAlter) throw new Error('Acesso negado!');
-            console.log(agendamento)
+
             return res.json(agendamento);   
         }catch(e){
             return res.status(400).json({error_message:e});

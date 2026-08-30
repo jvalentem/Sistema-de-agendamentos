@@ -1,43 +1,132 @@
 <%- include(partials + '/header-selector.ejs')%>
-    <h1><%=servico.nome%></h1>
-    <div class="horarios">
-        <h2>Horários Disponíveis:</h2>
-        <% if(servico.horarios.every(horario => horario.ocupado)){%>
-            <h3>Nenhum horário disponível para esse serviço!</h3>
-        <%}%>
-        <%servico.horarios.forEach(horario=>{%>
-            <%if(horario.ocupado == false){%>
-                <div class="horario">
-                    <p><%=horario.hora%></p>
-                    <button id=<%= `${horario.id}`%> class="agendamentoButton">Agende nesse horário</button> <!-- fetch no js -->
-                </div>
+    <main class="single-service-page">
+        <section class="service-header">
+            <p class="eyebrow">Serviço</p>
+            <h1><%=servico.nome%></h1>
+            <p class="service-description">Escolha o melhor horário e complete os dados do cliente para confirmar seu agendamento.</p>
+        </section>
+
+        <div class="horarios">
+            <h2>Horários Disponíveis:</h2>
+            <% if(servico.horarios.every(horario => horario.ocupado)){%>
+                <h3>Nenhum horário disponível para esse serviço!</h3>
             <%}%>
-        <%})%>
+            <%servico.horarios.forEach(horario=>{%>
+                <%if(horario.ocupado == false){%>
+                    <div class="horario">
+                        <p><%=horario.hora%></p>
+                        <button id=<%= `${horario.id}`%> class="agendamentoButton">Agende nesse horário</button>
+                    </div>
+                <%}%>
+            <%})%>
+        </div>
+    </main>
+
+    <div id="modal-agendamento" class="modal-agendamento hidden" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Dados do cliente</h2>
+                <button type="button" class="close-modal" aria-label="Fechar formulário">×</button>
+            </div>
+
+            <form id="form-agendamento" class="form-agendamento">
+                <input type="hidden" id="horarioId" name="horarioId" />
+
+                <label>
+                    <span>Nome</span>
+                    <input type="text" name="nome" placeholder="Digite seu nome completo" required>
+                </label>
+
+                <label>
+                    <span>Telefone</span>
+                    <input type="tel" name="telefone" placeholder="(11) 99999-9999" required>
+                </label>
+
+                <label>
+                    <span>Email</span>
+                    <input type="email" name="email" placeholder="seuemail@email.com" required>
+                </label>
+
+                <button type="submit" class="submit-button">Confirmar agendamento</button>
+            </form>
+        </div>
     </div>
 
     <script>
+        const modal = document.getElementById('modal-agendamento');
+        const form = document.getElementById('form-agendamento');
+        const horarioInput = document.getElementById('horarioId');
+        const closeButton = document.querySelector('.close-modal');
         const agendamentoButtons = document.querySelectorAll('button.agendamentoButton');
-        
-        function defineAgendamentoButtons(){
-            agendamentoButtons.forEach(b => {
-                const sid = b.getAttribute('id');
-                if(!sid) return false; 
 
-                b.onclick = ()=>{
-                    fetch(`/servico/agendar/${sid}`,{method:'POST'}).then(res =>{
-                        if(!res.ok) return res.json().then(details => {
-                            window.location.reload();
-                            alert(details.error_message);
-                        })
-                        
-                        return res.json();
-                    }).then(details =>{
-                        window.location.href = details.redirectTo;
-                    })
-                }
-            })
+        function abrirModal(horarioId) {
+            horarioInput.value = horarioId;
+            modal.classList.remove('hidden');
+            modal.setAttribute('aria-hidden', 'false');
+            form.querySelector('input[name="nome"]').focus();
         }
-        defineAgendamentoButtons()
+
+        function fecharModal() {
+            modal.classList.add('hidden');
+            modal.setAttribute('aria-hidden', 'true');
+            form.reset();
+            horarioInput.value = '';
+        }
+
+        agendamentoButtons.forEach((button) => {
+            button.onclick = () => {
+                const horarioId = button.getAttribute('id');
+                if (!horarioId) return;
+                abrirModal(horarioId);
+            }
+        });
+
+        closeButton.onclick = fecharModal;
+
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) fecharModal();
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const horarioId = horarioInput.value;
+            const dadosCliente = {
+                nome: form.nome.value.trim(),
+                telefone: form.telefone.value.trim(),
+                email: form.email.value.trim()
+            };
+
+            if (!horarioId) {
+                alert('Selecione um horário antes de confirmar.');
+                return;
+            }
+
+            if (!dadosCliente.nome || !dadosCliente.telefone || !dadosCliente.email) {
+                alert('Preencha nome, telefone e email para continuar.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/servico/agendar/${horarioId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dadosCliente)
+                });
+
+                const details = await response.json();
+
+                if (!response.ok) {
+                    alert(details.error_message || 'Não foi possível realizar o agendamento.');
+                    return;
+                }
+
+                fecharModal();
+                window.location.href = details.redirectTo;
+            } catch (error) {
+                alert('Ocorreu um erro ao criar o agendamento.');
+            }
+        });
     </script>
 </body>
 </html>

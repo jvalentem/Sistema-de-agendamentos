@@ -28,14 +28,9 @@ class ServicosService{
         return servico || false;
     }
 
-    static async getServicos(sessionId){
-        //O id do admin é 0 e !0 = true
-        const userZero = sessionId === 0;
-        if(!sessionId && !userZero) return false;
-        //Previne que um funcionario, ao logar no sistema,
-        //agende um horário com o próprio serviço
+    static async getServicos(){
     
-        const [servicos] = await pool.query(`select * from servicos where fk_funcionario != ${Number(sessionId)}`);
+        const [servicos] = await pool.query(`select * from servicos`);
 
         const completeServicos = await Promise.all(
             servicos.map(async s =>{
@@ -49,12 +44,12 @@ class ServicosService{
 
     static async getHorarioBySID(sid){
         const servico = await this.getServiceBySID(sid);
-        console.log('serviço nao existe: ', !servico)
+
         if(!servico) return false;
 
         
         const [[horario]] = await pool.query(`select * from horarios where id = ${sid}`);
-        console.log('horario nao existe: ', !horario)
+
         return horario || false;
     }
 }

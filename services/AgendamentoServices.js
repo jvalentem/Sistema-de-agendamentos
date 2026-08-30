@@ -26,7 +26,7 @@ class AgendamentoService{
         const agendamento = await this.getAgendamentoByID(sid);
         if(!agendamento) return false;
         const horario = await ServicosService.getHorarioBySID(agendamento.fk_horario);
-        console.log(horario)
+
         if(!horario) return false;
         //Se nao for nem o cliente e nem o funcionario daquele agendamento,
         //Então nao pode cancelar
@@ -36,9 +36,9 @@ class AgendamentoService{
         const statusCanceladoQuery = `update agendamentos set aStatus = "Cancelado" where id = ${agendamento.id}`
         const livrarHorarioQuery = `update horarios set ocupado = false where id = ${horario.id}`
         
-        await pool.query(statusCanceladoQuery).then(q => console.log('result:',q))
+        await pool.query(statusCanceladoQuery)
     
-        await pool.query(livrarHorarioQuery).then(q => console.log('result:',q))
+        await pool.query(livrarHorarioQuery)
 
         return true;
     }
@@ -51,7 +51,7 @@ class AgendamentoService{
         //Novamente, o id do admin é 0
         const userZero = clienteId === 0;
         const horarioOcupado = horario.ocupado;
-        console.log(!servico, !horario, !clienteId, !userZero, horarioOcupado)
+
         if(!servico || !horario || (!clienteId && !userZero) || horarioOcupado) return false;
 
         //insert into agendamentos values(servicoId,horarioId,hora,clienteId,funcionarioId)
