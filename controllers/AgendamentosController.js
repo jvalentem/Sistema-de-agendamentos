@@ -9,20 +9,20 @@ class AgendamentosController{
             const currentUser = await UserService.getUserById(session.user.id);
             
             const agendamentoid = req.params.id;
-            
             //select * from agendamentos where id = agendamentoid
             const agendamento = await AgendamentoService.getAgendamentoByID(agendamentoid);
 
+            console.log('AGENDAMENTO:',agendamento)
             if(!agendamento) throw new Error("Agendamento não encontrado");
             const canAlter = await AgendamentoService.canAlterAgendamento(currentUser,agendamento);
-
+            console.log('PODE CONSULTAR:', canAlter)
             //select * from servicos where id = servicoId
             agendamento.servico = await ServicosService.getServiceById(agendamento.fk_servico)
             
             //select * from users where id = clienteId
             agendamento.cliente = await UserService.getUserById(agendamento.fk_cliente)
-            agendamento.funcionario = await UserService.getUserById(agendamento.fk_funcionario);
-
+            agendamento.servico.funcionario = await UserService.getUserById(agendamento.fk_funcionario);
+            console.log('AGENDAMENTO ATUALIZADO:',agendamento)
             if(!canAlter) throw new Error('Acesso negado!');
 
             return res.json(agendamento);   

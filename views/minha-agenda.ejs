@@ -1,20 +1,20 @@
 <%- include(partials + '/header-selector.ejs')%>
 
-    <div id="detalhes-agendamento" hidden>
+    <div id="detalhes-agendamento" class="janela-flutuante" hidden>
             <h1 id="details-nome-servico"></h1>
             <h2 id="details-nome-funcionario"></h2>
             <h2 id="details-nome-cliente"></h2>
             <h2 id="details-horario"></h2>
         </div>
         <h1>Sua Agenda:</h1>
-        <%if(agendamentos.length <= 0){%>
+        <%if(agendamentosCompletos.length <= 0){%>
             <p>Nenhum agendamento no momento!</p>
         <%}%>
-    <%agendamentos.forEach(a =>{%>
+    <%agendamentosCompletos.forEach(a =>{%>
         <div class="agendamento">
             <p>Serviço: <%= a.servico.nome%></p>
             <p>Horário: <%= a.hora%></p>
-            <p>Status: <%= a.status%></p>
+            <p>Status: <%= a.aStatus%></p>
             <button id=<%= 'detalhar-' + a.id %> class="detalhar">Detalhar</button>
 
             <%if(a.status !== 'Cancelado'){%>
@@ -51,7 +51,6 @@
                 if(details){
 
                     const agendamentoId = details.id
-                    
                     nomeServico.textContent = `Nome do serviço: ${details.servico.nome}`
                     funcionario.textContent = `Atendente: ${details.servico.funcionario.nome}`
                     horario.textContent = `Horário: ${details.hora}`

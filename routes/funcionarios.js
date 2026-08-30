@@ -4,10 +4,13 @@ const {FuncionarioController} = require('../controllers/FuncionarioController')
 const {AgendamentosController } = require('../controllers/AgendamentosController')
 const {UserController} = require('../controllers/UserController');
 const { authorize } = require('../middlewares/authorize');
+const {defineSession} = require('../middlewares/sessionDefiner')
 
 router.use(authorize('funcionario'))
 
-router.get('/servicos',FuncionarioController.getFuncionarioServices)
+
+
+router.get('/servicos',defineSession(),FuncionarioController.getFuncionarioServices)
 
 router.get('/agendamentos',FuncionarioController.getAgenda);
 

@@ -7,8 +7,15 @@ class AgendamentoService{
     static async getAgendamentoByID(sid){
 
         const [[agendamento]] = await pool.query(`select * from agendamentos where id = ${sid}`)
-
+        
         return agendamento || false;
+    }
+
+    static async getServico(agendamento){
+        const query = `select * from servicos where id = ${agendamento.fk_servico}`;
+        const [[servico]] = await pool.query(query);
+        
+        return servico || false;
     }
 
     static async canAlterAgendamento(user,agendamento){

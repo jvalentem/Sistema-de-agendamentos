@@ -52,6 +52,17 @@ class ServicosService{
 
         return horario || false;
     }
+
+    static async getFuncionario(sid){
+        const getServiceQuery = `select * from servicos where id = ${sid}`;
+        const [[servico]] = await pool.query(getServiceQuery);
+        
+        if(!servico) return false;
+        const getFuncionarioQuery = `select * from usuarios where id = ${servico.fk_funcionario} and acesso= "funcionario"`;
+        const [[funcionario]] = await pool.query(getFuncionarioQuery);
+
+        return funcionario || false;
+    }
 }
 
 module.exports = {ServicosService}

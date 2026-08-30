@@ -1,3 +1,4 @@
+const { FuncionarioService } = require('../services/FuncionarioService');
 const {UserService} = require('../services/UserService');
 
 class UserController{
@@ -5,16 +6,24 @@ class UserController{
 
     static async login(req,res){
         try{
+            const {nome,senha} = req.body;
 
-            if(!req.body) return false;
-            const dados = req.body;
+            const user = await UserService.validateUser(nome,senha);
+            if(!user) return res.status(403).json({error_message:'Acesso negado!'});
 
-            const usuario = await UserService.validateUser(dados.nome,dados.senha)
-            if(!usuario) return res.status(401).json({error_message:'Usuario ou senha incorretos'})
+            const acesso = user.acesso;
+
+            if(!acesso) return res.status(400).json({error_message:'Erro ao consultar o acesso'})
             
-            req.session.user = usuario;
+            req.session.user = user;
 
-            return res.status(201).json({'redirectTo':'/'});
+            if(acesso === 'admin') return //pagina de admin
+            if(acesso === 'funcionario') {
+                
+                //Não é necessário adicionar um if !agendamentosFuncionario
+                //Pois um funcionario pode nao ter agendamentos marcados (vetor vazio)
+                return res.status(200).json({'redirectTo':'/funcionario/agendamentos'});
+            }
 
         }catch(e){
             return res.status(400).json({error_message:e});
