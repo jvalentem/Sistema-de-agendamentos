@@ -122,7 +122,9 @@
                 }
 
                 fecharModal();
-                window.location.href = details.redirectTo;
+                window.location.reload();
+                alert('Agendado com sucesso!')
+            
             } catch (error) {
                 alert('Ocorreu um erro ao criar o agendamento.');
             }

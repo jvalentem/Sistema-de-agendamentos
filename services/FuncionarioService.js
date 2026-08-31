@@ -2,7 +2,8 @@ const pool = require('../data/mysql').pool;
 
 class FuncionarioService{
     static async getFuncionarioById(id){
-        const [[funcionario]] = await pool.query(`select * from usuarios where id = ${Number(id)}`);
+        const selectQuery = 'select * from usuarios where id = ?'
+        const [[funcionario]] = await pool.query(selectQuery,[id]);
 
         return funcionario || false;
     }
@@ -11,15 +12,18 @@ class FuncionarioService{
         //select * from servicos where funcionarioId = id
         const funcionario = await this.getFuncionarioById(id);
         if(!funcionario) return false;
-
-        const [servicosFuncionario] = await pool.query(`select * from servicos where fk_funcionario = ${id}`);
+        
+        const selectQuery = 'select * from servicos where fk_funcionario = ?'
+        const [servicosFuncionario] = await pool.query(selectQuery,[id]);
         
         return servicosFuncionario || false;
     }
     static async getFuncionarioAgenda(id){
         const funcionario = await this.getFuncionarioById(id);
         if(!funcionario) return false;
-        const [agendamentos] = await pool.query(`select * from agendamentos where fk_funcionario = ${id}`);
+
+        const selectQuery = 'select * from agendamentos where fk_funcionario = ?'
+        const [agendamentos] = await pool.query(selectQuery,[id]);
 
         return agendamentos || false;
     }

@@ -17,11 +17,8 @@ class AgendamentosController{
             const canAlter = await AgendamentoService.canAlterAgendamento(currentUser,agendamento);
             console.log('PODE CONSULTAR:', canAlter)
             //select * from servicos where id = servicoId
-            agendamento.servico = await ServicosService.getServiceById(agendamento.fk_servico)
             
             //select * from users where id = clienteId
-            agendamento.cliente = await UserService.getUserById(agendamento.fk_cliente)
-            agendamento.servico.funcionario = await UserService.getUserById(agendamento.fk_funcionario);
             console.log('AGENDAMENTO ATUALIZADO:',agendamento)
             if(!canAlter) throw new Error('Acesso negado!');
 

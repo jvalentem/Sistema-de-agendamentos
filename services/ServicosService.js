@@ -1,18 +1,22 @@
 // const data = require('../data/databaseModel')
 const pool = require('../data/mysql').pool;
-const Servico = require('../models/Servico');
 const { FuncionarioService } = require('./FuncionarioService');
 class ServicosService{
 
-    static async createService(servico){
-        // const servico = new Servico('serviço','funcionario',[],45,45)
+    static async createService(nome,funcionario,preco,duracao){
+        if(!nome,!funcionario,!preco,!duracao) return false;
+        const insertQuery = 'INSERT INTO servicos(nome,fk_funcionario,preco,duracao) VALUES (?,?,?,?)';
 
-        data.servicos.push(servico);
+        await pool.query(insertQuery,[nome,funcionario.id,preco,duracao]);
+
+        return true;
     }
     static async getServiceById(id){
-        const [[servico]] = await pool.query(`select * from servicos where id = ${Number(id)}`);
+        const selectQuery = 'select * from servicos where id = ?';
+        const [[servico]] = await pool.query(selectQuery,[Number(id)]);
         if(!servico) return false;
-        const [horarios] = await pool.query(`select * from horarios where fk_servico = ${servico.id}`);
+        const horariosQuery = 'select * from horarios where fk_servico = ?';
+        const [horarios] = await pool.query(horariosQuery,[servico.id]);
         servico.horarios = [...horarios]
 
         return servico || false;
@@ -20,9 +24,11 @@ class ServicosService{
 
     static async getServiceBySID(fkHorario){
         //"A qual serviço pertence esse horário?"
-        const [[horario]] = await pool.query(`select * from horarios where id = ${Number(fkHorario)}`)
+        const selectQuery = 'select * from horarios where id = ?';
+        const [[horario]] = await pool.query(selectQuery,[Number(fkHorario)])
         if(!horario) return false;
-        const [[servico]] = await pool.query(`select * from servicos where id = ${horario.fk_servico}`)
+        const serviceQuery = 'select * from servicos where id = ?';
+        const [[servico]] = await pool.query(serviceQuery,[horario.fk_servico])
         
 
         return servico || false;
@@ -30,7 +36,8 @@ class ServicosService{
 
     static async getServicos(){
     
-        const [servicos] = await pool.query(`select * from servicos`);
+        const selectQuery = 'select * from servicos';
+        const [servicos] = await pool.query(selectQuery);
 
         const completeServicos = await Promise.all(
             servicos.map(async s =>{
@@ -47,19 +54,19 @@ class ServicosService{
 
         if(!servico) return false;
 
-        
-        const [[horario]] = await pool.query(`select * from horarios where id = ${sid}`);
+        const selectQuery = 'select * from horarios where id = ?';
+        const [[horario]] = await pool.query(selectQuery,[sid]);
 
         return horario || false;
     }
 
     static async getFuncionario(sid){
-        const getServiceQuery = `select * from servicos where id = ${sid}`;
-        const [[servico]] = await pool.query(getServiceQuery);
+        const getServiceQuery = 'select * from servicos where id = ?';
+        const [[servico]] = await pool.query(getServiceQuery,[sid]);
         
         if(!servico) return false;
-        const getFuncionarioQuery = `select * from usuarios where id = ${servico.fk_funcionario} and acesso= "funcionario"`;
-        const [[funcionario]] = await pool.query(getFuncionarioQuery);
+        const getFuncionarioQuery = 'select * from usuarios where id = ? and acesso = "funcionario"';
+        const [[funcionario]] = await pool.query(getFuncionarioQuery,[servico.fk_funcionario]);
 
         return funcionario || false;
     }

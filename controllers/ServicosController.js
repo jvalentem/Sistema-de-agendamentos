@@ -53,8 +53,9 @@ class ServicosController{
 
             if(!agendamento) return res.status(400).json({error_message:'Erro ao criar agendamento'});
 
-
+            return res.status(200).json('Agendamento criado com sucesso!')
         } catch (error) {
+            console.log('erro:',error)
             return res.status(500).json({error_message: 'Erro interno ao criar o agendamento.'});
         }
     }

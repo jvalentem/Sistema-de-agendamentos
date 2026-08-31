@@ -5,15 +5,16 @@ const { ServicosService } = require('./ServicosService');
 class AgendamentoService{
 
     static async getAgendamentoByID(sid){
-
-        const [[agendamento]] = await pool.query(`select * from agendamentos where id = ${sid}`)
+        const selectQuery ='SELECT agendamentos.*, clientes.nome AS nome_cliente,usuarios.nome AS nome_funcionario,servicos.nome AS nome_servico, horarios.hora AS horario FROM agendamentos JOIN clientes ON clientes.id = agendamentos.fk_cliente JOIN usuarios ON usuarios.id = agendamentos.fk_funcionario JOIN servicos ON servicos.id = agendamentos.fk_servico JOIN horarios ON horarios.id = agendamentos.fk_horario WHERE agendamentos.id = ?'
         
+        const [[agendamento]] = await pool.query(selectQuery,[sid])
+
         return agendamento || false;
     }
 
     static async getServico(agendamento){
-        const query = `select * from servicos where id = ${agendamento.fk_servico}`;
-        const [[servico]] = await pool.query(query);
+        const query = `select * from servicos where id = ?`;
+        const [[servico]] = await pool.query(query,[agendamento.fk_servico]);
         
         return servico || false;
     }
@@ -40,34 +41,34 @@ class AgendamentoService{
         const canAlter = await this.canAlterAgendamento(user, agendamento); 
         if(!canAlter) throw new Error('Você nao tem permissão para cancelar este agendamento')
         
-        const statusCanceladoQuery = `update agendamentos set aStatus = "Cancelado" where id = ${agendamento.id}`
-        const livrarHorarioQuery = `update horarios set ocupado = false where id = ${horario.id}`
+        const statusCanceladoQuery = `update agendamentos set aStatus = "Cancelado" where id = ?`
+        const livrarHorarioQuery = `update horarios set ocupado = false where id = ?`
         
-        await pool.query(statusCanceladoQuery)
+        await pool.query(statusCanceladoQuery,[agendamento.id])
     
-        await pool.query(livrarHorarioQuery)
+        await pool.query(livrarHorarioQuery,[horario.id])
 
         return true;
     }
 
     static async deleteAgendamento(sid){
-        await pool.query(`delete from agendamentos where id = ${sid}`)
+        await pool.query(`delete from agendamentos where id = ?`,[sid])
     }
 
     static async createAgendamento(servico,horario,clienteId){
         //Novamente, o id do admin é 0
         const userZero = clienteId === 0;
         const horarioOcupado = horario.ocupado;
-
+        console.log(!servico,!horario,!clienteId)
         if(!servico || !horario || (!clienteId && !userZero) || horarioOcupado) return false;
 
         //insert into agendamentos values(servicoId,horarioId,hora,clienteId,funcionarioId)
-        const agendamento = new AgendamentoModel(servico,horario,clienteId);
         
-        await pool.query(`update horarios set ocupado = true where id = ${horario.id}`);
-        
-        await pool.query(`insert into agendamentos(fk_servico, fk_horario, fk_cliente, fk_funcionario, hora) values(${servico.id},${horario.id},${clienteId},${servico.fk_funcionario},"${horario.hora}")`)
-        
+        await pool.query(`update horarios set ocupado = true where id = ?`,[horario.id]);
+        console.log('horario ocupado')
+        const insertQuery = `insert into agendamentos(fk_servico, fk_horario, fk_cliente, fk_funcionario, hora) values(?,?,?,?,?)`
+        await pool.query(insertQuery,[servico.id,horario.id,clienteId,servico.fk_funcionario,horario.hora])
+        console.log('agendamento criado')
         
         return true;
     }
