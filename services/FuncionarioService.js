@@ -13,7 +13,7 @@ class FuncionarioService{
         const funcionario = await this.getFuncionarioById(id);
         if(!funcionario) return false;
         
-        const selectQuery = 'select * from servicos where fk_funcionario = ?'
+        const selectQuery = 'select * from servicos where fk_funcionario = ? and ativo = true'
         const [servicosFuncionario] = await pool.query(selectQuery,[id]);
         
         return servicosFuncionario || false;

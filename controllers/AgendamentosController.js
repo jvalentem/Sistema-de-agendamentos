@@ -9,17 +9,12 @@ class AgendamentosController{
             const currentUser = await UserService.getUserById(session.user.id);
             
             const agendamentoid = req.params.id;
-            //select * from agendamentos where id = agendamentoid
             const agendamento = await AgendamentoService.getAgendamentoByID(agendamentoid);
 
-            console.log('AGENDAMENTO:',agendamento)
             if(!agendamento) throw new Error("Agendamento não encontrado");
+
             const canAlter = await AgendamentoService.canAlterAgendamento(currentUser,agendamento);
-            console.log('PODE CONSULTAR:', canAlter)
-            //select * from servicos where id = servicoId
-            
-            //select * from users where id = clienteId
-            console.log('AGENDAMENTO ATUALIZADO:',agendamento)
+
             if(!canAlter) throw new Error('Acesso negado!');
 
             return res.json(agendamento);   
@@ -35,10 +30,15 @@ class AgendamentosController{
         
             const userId = currentUser.id;
             const agendamentoId = req.params.sid;
+            const agendamento = AgendamentoService.getAgendamentoByID(agendamentoId);
 
+            const canAlter = await AgendamentoService.canAlterAgendamento(currentUser,agendamento)
+            
+            if(!canAlter) return res.status(403).json({error_message:'Você não tem permissao para cancelar esse agendamento'});
+            
             await AgendamentoService.cancelarAgendamento(agendamentoId,currentUser);
             
-            return res.status(201).json({});
+            return res.status(201).json('Agendamento cancelado');
         }catch(e){
             return res.send('Erro: ', e);
         }
@@ -47,10 +47,9 @@ class AgendamentosController{
     static async apagarRegistro(req,res){
         try{
             if(!req.session.user) return res.redirect('/')
-
+    
             const agendamento = await AgendamentoService.getAgendamentoByID(req.params.sid);
 
-            //Somente os admins podem apagar os registros de agendamentos (brevemente tera um sistema automatico)        
             await AgendamentoService.deleteAgendamento(agendamento.getId());
         }catch(e){
             return res.status(400).json({error_message:e});

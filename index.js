@@ -6,7 +6,6 @@ const funcionariosRouter = require('./routes/funcionarios')
 //Controllers
 const {ServicosController} = require('./controllers/ServicosController');
 
-const data = require('./data/databaseModel')
 const path = require('path')
 const bodyParser = require('body-parser')
 const express = require('express');

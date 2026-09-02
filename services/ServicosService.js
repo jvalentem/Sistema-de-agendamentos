@@ -1,4 +1,3 @@
-// const data = require('../data/databaseModel')
 const pool = require('../data/mysql').pool;
 const { FuncionarioService } = require('./FuncionarioService');
 class ServicosService{
@@ -11,14 +10,19 @@ class ServicosService{
 
         return true;
     }
-    static async getServiceById(id){
-        const selectQuery = 'select * from servicos where id = ?';
-        const [[servico]] = await pool.query(selectQuery,[Number(id)]);
-        if(!servico) return false;
-        const horariosQuery = 'select * from horarios where fk_servico = ?';
-        const [horarios] = await pool.query(horariosQuery,[servico.id]);
-        servico.horarios = [...horarios]
 
+    static async getHorarios(id){
+        const selectQuery = 'SELECT horarios.* FROM servicos JOIN horarios ON horarios.fk_servico = servicos.id where servicos.id = ?';
+        const [horarios] = await pool.query(selectQuery,[Number(id)]);
+        console.log(horarios);
+        return horarios || [];
+    }
+    static async getServiceById(id){
+        const selectQuery = 'SELECT * FROM servicos WHERE id = ?';
+        const [[servico]] = await pool.query(selectQuery,[Number(id)]);
+
+        servico.horarios = await this.getHorarios(id);
+        
         return servico || false;
     }
 
@@ -35,8 +39,8 @@ class ServicosService{
     }
 
     static async getServicos(){
-    
-        const selectQuery = 'select * from servicos';
+        //retorna apenas os servicos ativos
+        const selectQuery = 'select * from servicos where ativo = true';
         const [servicos] = await pool.query(selectQuery);
 
         const completeServicos = await Promise.all(
@@ -69,6 +73,15 @@ class ServicosService{
         const [[funcionario]] = await pool.query(getFuncionarioQuery,[servico.fk_funcionario]);
 
         return funcionario || false;
+    }
+
+    static async desativarServico(id){
+        console.log(id)
+        const servico = await this.getServiceById(id);
+        if(!servico) return false;
+
+        const deactivateQuery = `update servicos set ativo = false where id = ?`;
+        return await pool.query(deactivateQuery,[id]);
     }
 }
 

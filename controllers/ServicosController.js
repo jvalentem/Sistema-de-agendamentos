@@ -5,6 +5,26 @@ const { FuncionarioService } = require('../services/FuncionarioService');
 const {ClienteService} = require('../services/ClienteService');
 class ServicosController{
 
+    static async desativarServico(req,res){
+
+        //ao inves de apagar o servico, é melhor desativar
+        //pois a tabela de horarios tem fk_servico
+
+        const servicoId = req.params.sid;
+        if(!servicoId) return res.status(404).json('Serviço nao encontrado');
+        await ServicosService.desativarServico(servicoId)
+
+        return res.status(200).json('Serviço desativado!');
+    }
+    static async detalhar(req,res){
+        const servicoId = req.params.sid;
+
+        const servico = await ServicosService.getServiceById(servicoId);
+
+        if(!servico) return res.status(404).json('servico nao encontrado');
+
+        return res.status(200).json(servico);
+    }
     static async getServicos(req,res){
             
         let servicos = await ServicosService.getServicos()

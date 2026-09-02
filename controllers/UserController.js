@@ -3,6 +3,13 @@ const {UserService} = require('../services/UserService');
 
 class UserController{
 
+    static async logout(req,res){
+        req.session.destroy(err =>{
+            if(err) return res.status(500).json({error_message:'Não foi possivel encerrar a sessão'});
+
+            return res.redirect('/usuario/acesso-especial');
+        })
+    }
 
     static async login(req,res){
         try{

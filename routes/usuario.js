@@ -10,6 +10,8 @@ router.get('/acesso-especial',(req,res)=>{
     res.render('login');
 })
 
+router.post('/logout',sessionActive(),UserController.logout)
+
 router.post('/login',UserController.login)
 
 

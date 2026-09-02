@@ -2,6 +2,15 @@ CREATE DATABASE IF NOT EXISTS sistema_agendamentos;
 
 USE sistema_agendamentos;
 
+select * from agendamentos;
+
+select * from servicos;
+
+
+SELECT horarios.* FROM servicos JOIN horarios ON horarios.fk_servico = servicos.id where servicos.id = 2;
+
+select * from horarios;
+
 CREATE TABLE IF NOT EXISTS clientes(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255) NOT NULL,
@@ -25,7 +34,8 @@ CREATE TABLE IF NOT EXISTS servicos(
     fk_funcionario INT NOT NULL,
     FOREIGN KEY(fk_funcionario) REFERENCES usuarios(id),
     preco DOUBLE NOT NULL,
-    duracao INT NOT NULL
+    duracao INT NOT NULL,
+    ativo boolean not null default true
 );
 
 INSERT INTO servicos(nome,fk_funcionario,preco,duracao) VALUES ('Psicologia',1,45,60);

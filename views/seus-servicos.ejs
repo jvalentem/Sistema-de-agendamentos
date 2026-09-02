@@ -1,14 +1,96 @@
 <%- include(partials + '/header-selector.ejs')%>
-<h2>Seus serviços: </h2>
-<%servicos.forEach(s =>{%>
 
-    <div class="servico-box">
-        <h4><%=s.nome%></h4>
-        <p>Atendente: <%=user.nome%></p>
-        <p>R$<%=s.preco%></p>
-        <p>Duração aproximada: <%=s.duracao%> min</p>
-        <button id=<%= s.id%> class="editar-servico">Editar</button>
-        <button id=<%= s.id%> class="apagar-servico">Apagar</button>
-    </div>  
+<main class="servico-container">
+    <h2>Seus serviços:</h2>
 
-<%})%>
+    <div class="janela-flutuante" id="edit-window" hidden>
+        <form action="">
+            <label for="nome-servico">Nome do servico:</label>
+            <input type="text" value="" id="nome-servico" name="nome-servico">
+            <label for="preco-servico">Preço (R$):</label>
+            <input type="number" value="" id="preco-servico" name="preco-servico">
+            <label for="duracao-servico">Duração (em minutos):</label>
+            <input type="number" value="" id="duracao-servico" name="duracao-servico">
+            <input type="submit" value="Editar">
+        </form>
+    </div>
+
+    <%servicos.forEach(s =>{%>
+        <div class="servico-card">
+            <div class="servico-info">
+                <h4><%=s.nome%></h4>
+                <p>Atendente: Você</p>
+                <p>Preço: R$<%=s.preco%></p>
+                <p>Duração aproximada: <%=s.duracao%> min</p>
+            </div>
+
+            <div class="servico-actions">
+                <button id=<%= "editar-s" + s.id%> class="editar-servico">Editar</button>
+                <button id=<%= "desativar-s" + s.id%> class="desativar-servico">Desativar</button>
+            </div>
+        </div>
+    <%})%>
+</main>
+
+
+<script>
+    const editarButtons = document.querySelectorAll('button.editar-servico');
+    const apagarButtons = document.querySelectorAll('button.desativar-servico');
+    const editWindow = document.getElementById('edit-window')
+
+   
+    function define(details){
+        
+        if(!details) return false;
+        const nomeServico = editWindow.querySelector('input#nome-servico');
+        const preco = editWindow.querySelector('input#preco-servico');
+        const duracao = editWindow.querySelector('input#duracao-servico');
+
+        nomeServico.value = details.nome;
+        preco.value = details.preco;
+        duracao.value = details.duracao;
+
+        toggleEditWindow()
+    }
+    function toggleEditWindow(){
+        const isHidden = editWindow.hasAttribute('hidden')
+
+        
+        if(!isHidden) return editWindow.setAttribute('hidden',"true")
+        editWindow.removeAttribute('hidden')
+    }
+
+    editarButtons.forEach(b => {
+        const buttonId = b.getAttribute('id');
+
+        const sID = buttonId.substring(buttonId.indexOf('-') + 2);        
+        b.onclick = ()=>{
+            fetch(`/servico/detalhar/${sID}`,{method:'GET'}).then(res=>{
+                if(res.ok) return res.json();
+            }).then(details=>{
+                define(details);
+            })
+        }
+    })
+
+    apagarButtons.forEach(b =>{
+        const buttonId = b.getAttribute('id');
+        const sID = buttonId.substring(buttonId.indexOf('-') + 2); 
+
+        b.onclick = ()=>{
+
+            if(!window.confirm('Deseja desativar esse serviço?')) return false;
+
+            fetch(`/servico/apagar/${sID}`,{method:'DELETE'}).then(res=>{
+                if(res.ok) return res.json();
+                
+            }).then(sucesso=>{
+                window.location.reload()
+                alert(sucesso)
+            })
+        }
+    })
+
+</script>
+</body>
+</html>

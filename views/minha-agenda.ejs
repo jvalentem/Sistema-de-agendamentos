@@ -6,22 +6,32 @@
             <h2 id="details-nome-cliente"></h2>
             <h2 id="details-horario"></h2>
         </div>
-        <h1>Sua Agenda:</h1>
-        <%if(agendamentosCompletos.length <= 0){%>
-            <p>Nenhum agendamento no momento!</p>
-        <%}%>
-    <%agendamentosCompletos.forEach(a =>{%>
-        <div class="agendamento">
-            <p>Serviço: <%= a.servico.nome%></p>
-            <p>Horário: <%= a.hora%></p>
-            <p>Status: <%= a.aStatus%></p>
-            <button id=<%= 'detalhar-' + a.id %> class="detalhar">Detalhar</button>
 
-            <%if(a.status !== 'Cancelado'){%>
-                <button id=<%= 'cancelar-' + a.id%> class="cancelar">Cancelar</button>
+        <main class="agenda-container">
+            <h1>Sua Agenda:</h1>
+
+            <%if(agendamentos.length <= 0){%>
+                <p class="agenda-vazia">Nenhum agendamento no momento!</p>
             <%}%>
-        </div>    
-    <%})%>
+
+            <%agendamentos.forEach(a =>{%>
+                <div class="agendamento">
+                    <div class="agendamento-info">
+                        <p><strong>Serviço:</strong> <%= a.nome_servico%></p>
+                        <p><strong>Horário:</strong> <%= a.hora%></p>
+                        <p><strong>Status:</strong> <%= a.aStatus%></p>
+                    </div>
+
+                    <div class="agendamento-actions">
+                        <button id=<%= 'detalhar-' + a.id %> class="detalhar">Detalhar</button>
+
+                        <%if(a.aStatus !== 'Cancelado'){%>
+                            <button id=<%= 'cancelar-' + a.id%> class="cancelar">Cancelar</button>
+                        <%}%>
+                    </div>
+                </div>
+            <%})%>
+        </main>
 
 
     <script>

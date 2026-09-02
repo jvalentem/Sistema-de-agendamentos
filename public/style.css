@@ -17,22 +17,194 @@ form{
     flex-direction: column;
 }
 
-header nav{
-    display: flex;
-    justify-content: space-around;
-    padding: 1em;
-}
-header ul{
-    display: flex;
-    justify-content: space-around;
-    gap:1em;
-    list-style-type: none;
+.logout-form {
+    width: auto;
+    display: inline-flex;
+    margin: 0;
 }
 
-.servico-box{
-    padding: 2em;
-    border:1px solid #000;
-    width: fit-content;
+.logout-button {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.65rem 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    box-shadow: 0 10px 18px rgba(220, 38, 38, 0.18);
+}
+
+.logout-button:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+    box-shadow: 0 12px 22px rgba(220, 38, 38, 0.25);
+}
+
+header nav {
+    padding: 1rem 1.5rem;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+header ul {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+header li {
+    display: flex;
+    align-items: center;
+}
+
+header a {
+    color: #374151;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+header a:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.agenda-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.agenda-container h1 {
+    margin-bottom: 1.25rem;
+}
+
+.agenda-vazia {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.agendamento {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.agendamento-info {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.agendamento-info p {
+    margin: 0;
+}
+
+.agendamento-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.detalhar,
+.cancelar {
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.detalhar {
+    background: #e0e7ff;
+    color: #312e81;
+}
+
+.cancelar {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.detalhar:hover,
+.cancelar:hover {
+    opacity: 0.9;
+}
+
+.servico-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.servico-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.servico-info {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.servico-info h4,
+.servico-info p {
+    margin: 0;
+}
+
+.servico-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.servico-link,
+.editar-servico,
+.desativar-servico {
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.servico-link,
+.editar-servico {
+    background: #e0e7ff;
+    color: #312e81;
+}
+
+.desativar-servico {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.servico-link:hover,
+.editar-servico:hover,
+.desativar-servico:hover {
+    opacity: 0.9;
 }
 
 #agendamentos{
