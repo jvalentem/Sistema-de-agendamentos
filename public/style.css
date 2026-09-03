@@ -180,6 +180,7 @@ header a:hover {
 
 .servico-link,
 .editar-servico,
+.visualizar-horarios,
 .desativar-servico {
     border: none;
     border-radius: 8px;
@@ -201,11 +202,7 @@ header a:hover {
     color: #991b1b;
 }
 
-.servico-link:hover,
-.editar-servico:hover,
-.desativar-servico:hover {
-    opacity: 0.9;
-}
+
 
 #agendamentos{
     display: flex;

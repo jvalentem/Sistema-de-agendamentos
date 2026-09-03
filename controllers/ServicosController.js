@@ -3,7 +3,23 @@ const {AgendamentoService} = require('../services/AgendamentoServices')
 const {HorarioService} = require('../services/HorarioServices');
 const { FuncionarioService } = require('../services/FuncionarioService');
 const {ClienteService} = require('../services/ClienteService');
+
 class ServicosController{
+
+    static async getHorarios(req,res){
+
+    }
+    static async criarServico(req,res){
+        const info = req.body;
+        if(!info) return res.status(400).json('Erro ao criar o serviço');
+        
+        info.funcionarioId = req.session.user.id;
+        console.log(info);
+
+        await ServicosService.createService(info);
+
+        return res.redirect('/funcionario/servicos')
+    }
 
     static async desativarServico(req,res){
 
@@ -78,6 +94,16 @@ class ServicosController{
             console.log('erro:',error)
             return res.status(500).json({error_message: 'Erro interno ao criar o agendamento.'});
         }
+    }
+
+    static async editar(req,res){
+        const serviceId = req.params.sid;
+        if(!serviceId) return false
+        const info = req.body
+        
+        await ServicosService.editarServico(serviceId,info);
+
+        return res.status(200).json('Sucesso!');
     }
 
 }

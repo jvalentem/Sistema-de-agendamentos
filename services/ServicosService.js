@@ -2,11 +2,11 @@ const pool = require('../data/mysql').pool;
 const { FuncionarioService } = require('./FuncionarioService');
 class ServicosService{
 
-    static async createService(nome,funcionario,preco,duracao){
-        if(!nome,!funcionario,!preco,!duracao) return false;
+    static async createService(info){
+        if(!info) return false;
         const insertQuery = 'INSERT INTO servicos(nome,fk_funcionario,preco,duracao) VALUES (?,?,?,?)';
 
-        await pool.query(insertQuery,[nome,funcionario.id,preco,duracao]);
+        await pool.query(insertQuery,[info.nomeServico,info.funcionarioId,info.precoServico,info.duracaoServico]);
 
         return true;
     }
@@ -82,6 +82,16 @@ class ServicosService{
 
         const deactivateQuery = `update servicos set ativo = false where id = ?`;
         return await pool.query(deactivateQuery,[id]);
+    }
+
+    static async editarServico(id,info){
+        const servico = await this.getServiceById(id);
+
+        if(!servico) return false;
+
+        const editQuery = 'update servicos set nome = ?, duracao = ?, preco = ? where id = ?';
+
+        await pool.query(editQuery,[info.nome, info.duracao, info.preco, id]);
     }
 }
 
