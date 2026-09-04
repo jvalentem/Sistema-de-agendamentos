@@ -36,7 +36,7 @@ class ServicosController{
     }
 
     static async getServiceById(req,res){
-        const serviceId = req.params.serviceId;
+        const serviceId = req.params.sid;
         if(!serviceId) return res.status(400)
 
         const servico = await ServicosService.getServiceById(serviceId);

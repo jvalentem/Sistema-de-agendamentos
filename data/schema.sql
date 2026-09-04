@@ -11,6 +11,10 @@ SELECT horarios.* FROM servicos JOIN horarios ON horarios.fk_servico = servicos.
 
 select * from horarios;
 
+CREATE TABLE IF NOT EXISTS horarios(
+    
+);
+
 CREATE TABLE IF NOT EXISTS clientes(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255) NOT NULL,

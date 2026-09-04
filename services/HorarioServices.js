@@ -15,6 +15,8 @@ class HorarioService{
         const insertQuery = 'INSERT INTO horarios(hora,fk_servico) VALUES (?,?)';
 
         await pool.query(insertQuery,[hora,serviceId])
+
+        return true;
     }
 }
 
