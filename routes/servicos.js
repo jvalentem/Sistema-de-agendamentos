@@ -18,7 +18,7 @@ router.post('/:sid/horarios/criar',authorize('admin'),HorarioController.createHo
 
 router.get('/:sid',ServicosController.getServiceById);
 router.get('/detalhar/:sid',authorize('funcionario','admin'),ServicosController.detalhar)
-router.get('/:sid/horarios',authorize('funcionario','admin'),isSameFuncionario,HorarioController.getHorarios);
+router.get('/:sid/horarios',authorize('funcionario','admin'),isSameFuncionario,ServicosController.getHorarios);
 
 router.delete('/apagar/:sid',authorize('funcionario','admin'),isSameFuncionario,ServicosController.desativarServico)
 

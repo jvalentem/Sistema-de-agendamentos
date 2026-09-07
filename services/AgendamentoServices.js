@@ -56,7 +56,11 @@ class AgendamentoService{
     }
 
     static async createAgendamento(servico,horario,clienteId){
-        //Novamente, o id do admin é 0
+
+       // FAZER COM QUE AO CRIAR UM AGENDAMENTO
+       // SEJA ENVIADO, POR EMAIL, UM LINK COM O TOKEN DE ACESSO
+       // PARA GERENCIAR O AGENDAMENTO
+
         const userZero = clienteId === 0;
         const horarioOcupado = horario.ocupado;
         console.log(!servico,!horario,!clienteId)

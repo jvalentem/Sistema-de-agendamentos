@@ -7,7 +7,17 @@ const {ClienteService} = require('../services/ClienteService');
 class ServicosController{
 
     static async getHorarios(req,res){
+        try{
+            const serviceId = req.params.sid;
 
+            if(!serviceId) return res.status(400).json('Serviço não informado');
+
+            const horarios = await ServicosService.getHorarios(serviceId);
+
+            return res.status(200).json(horarios);
+        }catch(e){
+            return res.status(500).json('Erro ao consultar os horarios');
+        }
     }
     static async criarServico(req,res){
         const info = req.body;
