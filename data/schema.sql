@@ -2,15 +2,6 @@ CREATE DATABASE IF NOT EXISTS sistema_agendamentos;
 
 USE sistema_agendamentos;
 
-select * from agendamentos;
-
-select * from servicos;
-
-
-SELECT horarios.* FROM servicos JOIN horarios ON horarios.fk_servico = servicos.id where servicos.id = 2;
-
-select * from horarios;
-
 CREATE TABLE IF NOT EXISTS clientes(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255) NOT NULL,
@@ -54,8 +45,6 @@ INSERT INTO horarios(hora,fk_servico) VALUES ('15:00',1);
 INSERT INTO horarios(hora,fk_servico) VALUES ('16:00',1);
 INSERT INTO horarios(hora,fk_servico) VALUES ('17:00',2);
 INSERT INTO horarios(hora,fk_servico) VALUES ('18:00',2);
-
-
 
 CREATE TABLE IF NOT EXISTS agendamentos(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
