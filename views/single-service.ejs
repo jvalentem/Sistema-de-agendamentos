@@ -91,6 +91,7 @@
             event.preventDefault();
 
             const horarioId = horarioInput.value;
+
             const dadosCliente = {
                 nome: form.nome.value.trim(),
                 telefone: form.telefone.value.trim(),
@@ -115,12 +116,12 @@
                 });
 
                 const details = await response.json();
+                
 
                 if (!response.ok) {
                     alert(details.error_message || 'Não foi possível realizar o agendamento.');
                     return;
                 }
-
                 fecharModal();
                 window.location.reload();
                 alert('Agendado com sucesso!')

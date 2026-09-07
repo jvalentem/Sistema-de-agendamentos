@@ -26,18 +26,13 @@ class AgendamentosController{
         try{
             if(!req.session.user) return res.redirect('/');
 
-            const currentUser = await UserService.getUserById(req.session.user.id);
-        
-            const userId = currentUser.id;
-            const agendamentoId = req.params.sid;
-            const agendamento = AgendamentoService.getAgendamentoByID(agendamentoId);
+            
+            const agendamentoId = req.params.sid;       
+            
+            //esse middleware nao pode ser separado
+            const user = req.session.user;
+            await AgendamentoService.cancelarAgendamento(agendamentoId,user);
 
-            const canAlter = await AgendamentoService.canAlterAgendamento(currentUser,agendamento)
-            
-            if(!canAlter) return res.status(403).json({error_message:'Você não tem permissao para cancelar esse agendamento'});
-            
-            await AgendamentoService.cancelarAgendamento(agendamentoId,currentUser);
-            
             return res.status(201).json('Agendamento cancelado');
         }catch(e){
             return res.send('Erro: ', e);

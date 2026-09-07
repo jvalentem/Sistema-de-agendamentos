@@ -2,7 +2,8 @@
 const agendamentoRouter = require('./routes/agendamentos')
 const usuarioRouter = require('./routes/usuario');
 const servicosRouter = require('./routes/servicos');
-const funcionariosRouter = require('./routes/funcionarios')
+const funcionariosRouter = require('./routes/funcionarios');
+const horariosRouter = require('./routes/horarios');
 //Controllers
 const {ServicosController} = require('./controllers/ServicosController');
 
@@ -42,6 +43,7 @@ app.use('/agendamento', agendamentoRouter);
 app.use('/usuario', usuarioRouter);
 app.use('/servico',servicosRouter);
 app.use('/funcionario', funcionariosRouter)
+app.use('/horarios',horariosRouter)
 app.use(express.static('public')) //arquivos estáticos
 
 

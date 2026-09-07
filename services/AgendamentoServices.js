@@ -12,9 +12,9 @@ class AgendamentoService{
         return agendamento || false;
     }
 
-    static async getServico(agendamento){
+    static async getServico(agendamentoId){
         const query = `select * from servicos where id = ?`;
-        const [[servico]] = await pool.query(query,[agendamento.fk_servico]);
+        const [[servico]] = await pool.query(query,[agendamentoId]);
         
         return servico || false;
     }
@@ -46,7 +46,7 @@ class AgendamentoService{
         
         await pool.query(statusCanceladoQuery,[agendamento.id])
     
-        await pool.query(livrarHorarioQuery,[horario.id])
+        await pool.query(livrarHorarioQuery,[horario.id])  
 
         return true;
     }

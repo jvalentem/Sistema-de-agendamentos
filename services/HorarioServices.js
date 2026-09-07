@@ -15,6 +15,21 @@ class HorarioService{
         const insertQuery = 'INSERT INTO horarios(hora,fk_servico) VALUES (?,?)';
 
         await pool.query(insertQuery,[hora,serviceId])
+
+        return true;
+    }
+    static async isHorarioOcupado(id){
+        const selectQuery = `select * from horarios where id = ? and ocupado = true`
+        const [result] = await pool.query(selectQuery,[id]);
+
+        return result || false;
+    }
+    static async apagarHorario(id){
+        if(!id) return false;
+        const deleteQuery = `delete from horarios where id = ? a`;
+
+        await pool.query(deleteQuery,[id]);
+        return true;
     }
 }
 

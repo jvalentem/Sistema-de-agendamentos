@@ -2,29 +2,12 @@
 
 <main class="servico-container">
     <h2>Seus serviços:</h2>
-    <button id="criar-servico" class="submit-button">Criar novo</button>
-
     <div class="janela-flutuante" id="horarios" hidden>
-        <button>Cadastrar novo horário</button>
         <div id="horarios-box">
-            <div class="horario">
-                <p>16:00</p> 
-                <button>Remover horário</button> <!--Com o horarioId-->
-            </div>
         </div>
+        
     </div>
-    <div class="janela-flutuante" id="edit-window" hidden>
-        <form action="" id="edit-form">
-            <label for="nomeServico">Nome do servico:</label>
-            <input type="text" value="" id="nomeServico" name="nomeServico" required>
-            <label for="precoServico">Preço (R$):</label>
-            <input type="number" value="" id="precoServico" name="precoServico" required>
-            <label for="duracaoServico">Duração (em minutos):</label>
-            <input type="number" value="" id="duracaoServico" name="duracaoServico" required>
-            <input type="submit" value="Editar">
-        </form>
-    </div>
-
+    
     <%servicos.forEach(s =>{%>
         <div class="servico-card">
             <div class="servico-info">
@@ -36,8 +19,6 @@
 
             <div class="servico-actions">
                 <button id=<%= "horarios-s" + s.id%> class="visualizar-horarios">Visualizar horários</button>
-                <button id=<%= "editar-s" + s.id%> class="editar-servico">Editar</button>
-                <button id=<%= "desativar-s" + s.id%> class="desativar-servico">Desativar</button>
             </div>
         </div>
     <%})%>
@@ -45,64 +26,15 @@
 
 
 <script>
-    const editarButtons = document.querySelectorAll('button.editar-servico');
-    const apagarButtons = document.querySelectorAll('button.desativar-servico');
-    const visualizarHorariosButtons = document.querySelectorAll('button.visualizar-horarios');
-    const editWindow = document.getElementById('edit-window')
-    const hiddenForm = document.getElementById('edit-form');
+    //Buttons
+    const visualizarHorariosButtons = document.querySelectorAll('button.visualizar-horarios');   
+    //Windows
     const horariosWindow = document.getElementById('horarios');
     
-    const createServiceButton = document.getElementById('criar-servico');
-
-    function editMethod(e){
-
-        e.preventDefault();
-
-        const action = hiddenForm.getAttribute('action');
-        if(!action) return false;
-
-        const nome = hiddenForm.querySelector('#nomeServico').value;
-        const preco = hiddenForm.querySelector('#precoServico').value;
-        const duracao = hiddenForm.querySelector('#duracaoServico').value;
-
-        fetch(action,{
-            method:'PATCH',
-            headers:{'Accept':'application/json','Content-Type':'application/json'},
-            body: JSON.stringify({nome, preco, duracao})
-        }).then(res=>{
-            if(!res.ok) return alert("Falha ao editar o serviço, tente novamente mais tarde");
-
-            window.location.reload();
-            alert("Serviço alterado com sucesso!")
-        })
-    }
-    createServiceButton.onclick = ()=>{
-        toggleWindow('create')
-    }
-    
-    function define(details){
-        
-        if(!details) return false;
-        const nomeServico = editWindow.querySelector('input#nomeServico');
-        const preco = editWindow.querySelector('input#precoServico');
-        const duracao = editWindow.querySelector('input#duracaoServico');
-
-        const action = `/servico/editar/${details.id}`;
-
-        hiddenForm.setAttribute('action',action);
-        
-        nomeServico.value = details.nome;
-        preco.value = details.preco;
-        duracao.value = details.duracao;
-
-        hiddenForm.setAttribute('serviceid',details.id);
-
-        toggleWindow('edit')
-    }
+    //Essential Functions
     function toggleWindow(mode){
-        const isHidden = editWindow.hasAttribute('hidden')
-        const submit = hiddenForm.querySelector('input[type="submit"]');
 
+        //Se estiver no modo "view", o funcionario quer ver a tabela de horarios
         if(mode === 'view'){
             if(horariosWindow.hasAttribute('hidden')){
                 horariosWindow.removeAttribute('hidden');
@@ -111,58 +43,48 @@
             horariosWindow.setAttribute('hidden','true');
             return
         }
-
-
-        if(mode === 'create') {
-            submit.value = 'Criar serviço'
-            hiddenForm.setAttribute('action','/servico/criar')
-            hiddenForm.setAttribute('method','post');
-        }
-        if(mode === 'edit') {
-            submit.value = 'Editar'
-            hiddenForm.addEventListener('submit',editMethod,{once:true});
-        }
-
         
-        if(!isHidden) return editWindow.setAttribute('hidden',"true")
-        editWindow.removeAttribute('hidden')
+    }
+    
+    
+    function defineHorarios(horarios){
+        if(!horarios) return false;
+        horarios.forEach(h =>{
+            const horarioDiv = document.createElement('div');
+
+            const horarioText = document.createElement('p');
+            const servicoId = h.fk_servico;
+            
+            horarioText.textContent = h.hora;
+            horarioDiv.setAttribute('class','horario');
+            horarioDiv.setAttribute('id',h.id);
+            
+           
+            horarioDiv.appendChild(horarioText);            
+            horariosWindow.appendChild(horarioDiv);
+        })
+        
     }
 
-    editarButtons.forEach(b => {
-        const buttonId = b.getAttribute('id');
-
-        const sID = buttonId.substring(buttonId.indexOf('-') + 2);        
-        b.onclick = ()=>{
-            fetch(`/servico/detalhar/${sID}`,{method:'GET'}).then(res=>{
-                if(res.ok) return res.json();
-            }).then(details=>{
-                define(details);
-            })
-        }
-    })
-
-    apagarButtons.forEach(b =>{
-        const buttonId = b.getAttribute('id');
-        const sID = buttonId.substring(buttonId.indexOf('-') + 2); 
-
-        b.onclick = ()=>{
-
-            if(!window.confirm('Deseja desativar esse serviço?')) return false;
-
-            fetch(`/servico/apagar/${sID}`,{method:'DELETE'}).then(res=>{
-                if(res.ok) return res.json();
-                
-            }).then(sucesso=>{
-                window.location.reload()
-                alert(sucesso)
-            })
-        }
-    })
-
-    console.log(visualizarHorariosButtons)
+    //Event Listeneres
     visualizarHorariosButtons.forEach(b =>{
-        b.onclick = ()=>{
+        b.onclick = async ()=>{
+            let serviceId = b.getAttribute('id');
+            serviceId = Number(serviceId.substring(serviceId.indexOf('-s')+2));
+            
+            if(!serviceId) return false;
+
+            const path = `/servico/${serviceId}/horarios`
+            const response = await fetch(path,{method:'GET'});
+            
+            const horarios = await response.json();
+
+            defineHorarios(horarios)
             toggleWindow('view');
+        
+            //Voce deixou as janelas visiveis, e os horarios?
+            //Criar um metodo define para a tela de horarios
+            //e incluir o togglewindow
         }   
     })
     

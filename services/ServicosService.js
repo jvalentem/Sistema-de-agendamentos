@@ -19,8 +19,8 @@ class ServicosService{
     }
     static async getServiceById(id){
         const selectQuery = 'SELECT * FROM servicos WHERE id = ?';
-        const [[servico]] = await pool.query(selectQuery,[Number(id)]);
-
+        const [[servico]] = await pool.query(selectQuery,[id]);
+        console.log(servico)
         servico.horarios = await this.getHorarios(id);
         
         return servico || false;
