@@ -3,6 +3,7 @@ const {AgendamentoService} = require('../services/AgendamentoServices');
 const { ServicosService } = require('../services/ServicosService');
 
 class FuncionarioController{
+
     static async getFuncionarioServices(req,res){
         try{
             const currentUser = req.session.user;

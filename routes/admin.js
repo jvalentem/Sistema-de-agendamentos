@@ -2,11 +2,16 @@ const express = require('express');
 const router = express.Router();
 const {authorize} = require('../middlewares/authorize');
 const {sessionActive} = require('../middlewares/sessionActive')
+const {AdminController} =  require('../controllers/AdminController')
 
 router.use(sessionActive, authorize('admin'));
 
+router.use(
+    sessionActive,
+    authorize('admin')
+)
 
-router.get('/servicos',(req,res)=>{})
-router.get('/funcionarios',(req,res)=>{})
-router.get('/agendamentos',(req,res)=>{});
-router.get('/clientes',(req,res)=>{})
+router.get('/servicos',AdminController.getServicos)
+router.get('/funcionarios',AdminController.getFuncionarios)
+router.get('/agendamentos',AdminController.getAgendamentos);
+router.get('/clientes',AdminController.getClientes)

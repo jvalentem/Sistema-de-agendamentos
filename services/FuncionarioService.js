@@ -1,6 +1,12 @@
 const pool = require('../data/mysql').pool;
 
 class FuncionarioService{
+    static async getFuncionarios(){
+        const selectQuery = 'select * from usuarios where acesso = ?';
+        const [funcionarios] = await pool.query(selectQuery,['funcionario']);
+
+        return funcionarios;
+    }
     static async getFuncionarioById(id){
         const selectQuery = 'select * from usuarios where id = ?'
         const [[funcionario]] = await pool.query(selectQuery,[id]);

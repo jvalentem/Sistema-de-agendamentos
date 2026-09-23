@@ -1,5 +1,12 @@
 const pool = require('../data/mysql').pool
 class ClienteService{
+
+    static async getClientes(){
+        const selectQuery = 'SELECT * FROM CLIENTES'
+        const [clientes] = await pool.query(selectQuery);
+        return clientes;
+    }
+
     static async getClienteById(id){
         const selectQuery = 'select * from clientes where id = ?';
         const [[cliente]]  = await pool.query(selectQuery,[id]);

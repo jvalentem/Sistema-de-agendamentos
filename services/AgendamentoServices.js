@@ -3,7 +3,14 @@ const AgendamentoModel = require('../models/Agendamento');
 const { ServicosService } = require('./ServicosService');
 
 class AgendamentoService{
-
+    
+    static async getAgendamentos(){
+        //retorna todo o historico de agendamentos
+        //Incluir query para retornar o agendamento completo
+        const selectQuery = 'SELECT * FROM agendamentos';
+        const [agendamentos] = await pool.query(selectQuery);
+        return agendamentos;
+    }
     static async getAgendamentoByID(sid){
         const selectQuery ='SELECT agendamentos.*, clientes.nome AS nome_cliente,usuarios.nome AS nome_funcionario,servicos.nome AS nome_servico, horarios.hora AS horario FROM agendamentos JOIN clientes ON clientes.id = agendamentos.fk_cliente JOIN usuarios ON usuarios.id = agendamentos.fk_funcionario JOIN servicos ON servicos.id = agendamentos.fk_servico JOIN horarios ON horarios.id = agendamentos.fk_horario WHERE agendamentos.id = ?'
         

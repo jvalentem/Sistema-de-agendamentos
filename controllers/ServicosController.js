@@ -51,9 +51,9 @@ class ServicosController{
 
         return res.status(200).json(servico);
     }
-    static async getServicos(req,res){
+    static async getServicosAtivos(req,res){
             
-        let servicos = await ServicosService.getServicos()
+        let servicos = await ServicosService.getServicosAtivos()
         
         if(!servicos) return res.status(400).json({error_message:'erro ao carregar os serviços'});  
 

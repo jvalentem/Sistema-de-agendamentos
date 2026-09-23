@@ -51,5 +51,5 @@ app.listen(3000)
 
 
 
-app.get('/',ServicosController.getServicos)
+app.get('/',ServicosController.getServicosAtivos)
 

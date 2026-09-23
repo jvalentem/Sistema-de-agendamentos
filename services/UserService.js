@@ -3,6 +3,12 @@ const {ServicosService} = require('./ServicosService');
 
 class UserService{
 
+    static async getUsers(){
+        const selectQuery = 'SELECT * FROM usuarios'
+        const [usuarios] = await pool.query(usuarios);
+
+        return usuarios
+    }
     static async validateUser(nome,senha){
         try {
             if(!nome || !senha) return false;
