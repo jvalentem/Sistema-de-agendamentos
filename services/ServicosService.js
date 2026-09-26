@@ -39,17 +39,10 @@ class ServicosService{
     }
 
     static async getServicos(){
-        const selectQuery = 'select * from servicos';
+        const selectQuery = 'select servicos.* , usuarios.nome AS nome_funcionario FROM servicos JOIN usuarios ON usuarios.id = servicos.fk_funcionario';
         const [servicos] = await pool.query(selectQuery);
 
-        const completeServicos = await Promise.all(
-            servicos.map(async s =>{
-                const funcionario = await FuncionarioService.getFuncionarioById(s.fk_funcionario);
-                return {...s, funcionario}
-            })
-        )
-
-        return completeServicos || false;
+        return servicos || false;
     }
     static async getServicosAtivos(){
         //retorna apenas os servicos ativos

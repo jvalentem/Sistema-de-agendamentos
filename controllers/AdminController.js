@@ -19,6 +19,7 @@ class AdminController{
         try{
             const servicos = await ServicosService.getServicos();
             if(servicos) return res.status(200).json(servicos)
+
             return res.status(404).json('Nenhum serviço cadastrado')
         }catch(e){return res.status(400).json(e)}
     }
@@ -27,6 +28,7 @@ class AdminController{
         try{
             const agendamentos = await AgendamentoService.getAgendamentos();
             if(agendamentos) return res.status(200).json(agendamentos)
+
             return res.status(404).json('Nenhum agendamento!')
         }catch(e){return res.status(400).json(e)}
 
@@ -37,6 +39,7 @@ class AdminController{
         try{
             const usuarios = await UserService.getUsers()
             if(usuarios) return res.status(200).json(usuarios)
+
             return res.status(404).json('Nenhum usuario cadastrado')
         }catch(e){return res.status(400).json(e)}
     }
@@ -45,6 +48,7 @@ class AdminController{
         try{
             const clientes = await ClienteService.getClientes();
             if(clientes) return res.status(200).json(clientes)
+                
             return res.status(404).json('Nenhum cliente cadastrado')
         }catch(e){return res.status(400).json(e)}
     }

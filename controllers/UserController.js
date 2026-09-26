@@ -24,13 +24,8 @@ class UserController{
             
             req.session.user = user;
 
-            if(acesso === 'admin') return //pagina de admin
-            if(acesso === 'funcionario') {
-                
-                //Não é necessário adicionar um if !agendamentosFuncionario
-                //Pois um funcionario pode nao ter agendamentos marcados (vetor vazio)
-                return res.status(200).json({'redirectTo':'/funcionario/agendamentos'});
-            }
+            if(acesso === 'admin') return res.status(200).json({'redirectTo':'/administrativo/servicos'})
+            if(acesso === 'funcionario') return res.status(200).json({'redirectTo':'/funcionario/agendamentos'});
 
         }catch(e){
             return res.status(400).json({error_message:e});

@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS usuarios(
 
 INSERT INTO usuarios(nome,senha,acesso) VALUES ('Funcionario','123','funcionario');
 INSERT INTO usuarios(nome,senha,acesso) VALUES ('Funcionario2','123','funcionario');
+INSERT INTO usuarios(nome,senha,acesso) VALUES ('admin','123','admin');
 
 CREATE TABLE IF NOT EXISTS servicos(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
