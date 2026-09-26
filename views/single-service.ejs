@@ -8,7 +8,7 @@
 
         <div class="horarios">
             <h2>Horários Disponíveis:</h2>
-            <% if(servico.horarios.every(horario => horario.ocupado)){%>
+            <% if(servico.horarios.every(horario => horario.ocupado == true)){%>
                 <h3>Nenhum horário disponível para esse serviço!</h3>
             <%}%>
             <%servico.horarios.forEach(horario=>{%>

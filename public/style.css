@@ -224,6 +224,120 @@ header a:hover {
     padding: 1.5em;
 }
 
+.admin-container {
+    display: grid;
+    grid-template-columns: minmax(220px, 280px) 1fr;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.admin-side-bar {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+}
+
+.admin-side-bar button {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    color: #1f2937;
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-side-bar button:hover,
+.admin-side-bar button:focus-visible {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.admin-content {
+    padding: 0.5rem 0;
+}
+
+.admin-content h1 {
+    margin-bottom: 0.5rem;
+}
+
+.admin-modal-backdrop[hidden] {
+    display: none;
+}
+
+.admin-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(17, 24, 39, 0.55);
+}
+
+.admin-window.janela-flutuante {
+    position: relative;
+    inset: auto;
+    transform: none;
+    width: min(680px, 100%);
+    max-height: min(80vh, 700px);
+    overflow: auto;
+    border-color: #d1d5db;
+}
+
+.admin-window-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.admin-window-header h2 {
+    font-size: 1.25rem;
+}
+
+.admin-close {
+    border: 0;
+    background: transparent;
+    color: #4b5563;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.admin-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.admin-entry {
+    padding: 0.85rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+}
+
+.admin-entry p + p {
+    margin-top: 0.3rem;
+}
+
+.admin-message {
+    color: #4b5563;
+}
+
+@media (max-width: 640px) {
+    .admin-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
 .single-service-page {
     max-width: 900px;
     margin: 3rem auto;

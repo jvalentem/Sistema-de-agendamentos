@@ -1,3 +1,4 @@
+const { ClienteService } = require('../services/ClienteService');
 const { FuncionarioService } = require('../services/FuncionarioService');
 const {UserService} = require('../services/UserService');
 
@@ -24,7 +25,7 @@ class UserController{
             
             req.session.user = user;
 
-            if(acesso === 'admin') return res.status(200).json({'redirectTo':'/administrativo/servicos'})
+            if(acesso === 'admin') return res.status(200).json({'redirectTo':'/administrativo'})
             if(acesso === 'funcionario') return res.status(200).json({'redirectTo':'/funcionario/agendamentos'});
 
         }catch(e){
@@ -48,7 +49,7 @@ class UserController{
         const usuario = await UserController.getById(req,res) 
         if(!usuario) return res.status(404).json({error_message:'Usuario nao encontrado em nosso banco!'});
 
-        const userAgendamentos = await UserService.getUserAgendamentos(usuario.id)
+        const userAgendamentos = await ClienteService.getClienteAgendamentos(usuario.id)
 
         return res.render('me',{userAgendamentos})
     }

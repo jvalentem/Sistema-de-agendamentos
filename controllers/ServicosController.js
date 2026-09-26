@@ -13,7 +13,7 @@ class ServicosController{
             if(!serviceId) return res.status(400).json('Serviço não informado');
 
             const horarios = await ServicosService.getHorarios(serviceId);
-
+            
             return res.status(200).json(horarios);
         }catch(e){
             return res.status(500).json('Erro ao consultar os horarios');
@@ -31,14 +31,11 @@ class ServicosController{
         return res.redirect('/funcionario/servicos')
     }
 
-    static async desativarServico(req,res){
-
-        //ao inves de apagar o servico, é melhor desativar
-        //pois a tabela de horarios tem fk_servico
+    static async mudarStatus(req,res){
 
         const servicoId = req.params.sid;
         if(!servicoId) return res.status(404).json('Serviço nao encontrado');
-        await ServicosService.desativarServico(servicoId)
+        await ServicosService.mudarStatus(servicoId)
 
         return res.status(200).json('Serviço desativado!');
     }

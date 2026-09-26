@@ -76,8 +76,8 @@ class AgendamentoService{
         
         await pool.query(`update horarios set ocupado = true where id = ?`,[horario.id]);
         console.log('horario ocupado')
-        const insertQuery = `insert into agendamentos(fk_servico, fk_horario, fk_cliente, fk_funcionario, hora) values(?,?,?,?,?)`
-        await pool.query(insertQuery,[servico.id,horario.id,clienteId,servico.fk_funcionario,horario.hora])
+        const insertQuery = `insert into agendamentos(fk_servico, fk_horario, fk_cliente, fk_funcionario) values(?,?,?,?)`
+        await pool.query(insertQuery,[servico.id,horario.id,clienteId,servico.fk_funcionario])
         console.log('agendamento criado')
         
         return true;

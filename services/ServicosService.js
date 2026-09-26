@@ -84,13 +84,16 @@ class ServicosService{
         return funcionario || false;
     }
 
-    static async desativarServico(id){
+    static async mudarStatus(id){
         console.log(id)
         const servico = await this.getServiceById(id);
         if(!servico) return false;
 
         const deactivateQuery = `update servicos set ativo = false where id = ?`;
-        return await pool.query(deactivateQuery,[id]);
+        const activateQuery = 'update servicos set ativo = true where id = ?'
+        
+        const finalQuery = servico.ativo === 0 || !servico.ativo? activateQuery : deactivateQuery
+        return await pool.query(finalQuery,[id]);
     }
 
     static async editarServico(id,info){

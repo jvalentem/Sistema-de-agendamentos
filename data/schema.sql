@@ -33,7 +33,6 @@ CREATE TABLE IF NOT EXISTS servicos(
 INSERT INTO servicos(nome,fk_funcionario,preco,duracao) VALUES ('Psicologia',1,45,60);
 INSERT INTO servicos(nome,fk_funcionario,preco,duracao) VALUES ('Ed. Física',2,45,60);
 
-
 CREATE TABLE IF NOT EXISTS horarios(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     hora VARCHAR(255) NOT NULL,
@@ -53,6 +52,10 @@ CREATE TABLE IF NOT EXISTS agendamentos(
     fk_funcionario INT NOT NULL,
     fk_servico INT NOT NULL,
     fk_horario INT NOT NULL,
-    hora VARCHAR(255) NOT NULL,
-    aStatus VARCHAR(255) NOT NULL DEFAULT "Em andamento"
+    aStatus VARCHAR(255) NOT NULL DEFAULT "Em andamento",
+    
+    FOREIGN KEY(fk_cliente) REFERENCES clientes(id),
+    FOREIGN KEY(fk_funcionario) REFERENCES usuarios(id),
+    FOREIGN KEY (fk_servico) REFERENCES servicos(id),
+    FOREIGN KEY(fk_horario) REFERENCES horarios(id)
 );

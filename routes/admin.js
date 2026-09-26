@@ -12,6 +12,7 @@ router.use(
     authorize('admin')
 )
 
+router.get('/',(req,res)=>{res.render('painelAdmin')})
 router.get('/servicos',AdminController.getServicos)
 router.get('/funcionarios',AdminController.getFuncionarios)
 router.get('/agendamentos',AdminController.getAgendamentos);

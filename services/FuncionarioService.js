@@ -28,7 +28,7 @@ class FuncionarioService{
         const funcionario = await this.getFuncionarioById(id);
         if(!funcionario) return false;
 
-        const selectQuery = 'select * from agendamentos where fk_funcionario = ?'
+        const selectQuery = 'select agendamentos.*, usuarios.nome AS nome_funcionario, clientes.nome AS nome_cliente, servicos.nome AS nome_servico, horarios.hora AS hora FROM agendamentos JOIN usuarios ON usuarios.id = agendamentos.fk_funcionario JOIN clientes ON clientes.id = fk_cliente JOIN horarios ON horarios.id = fk_horario JOIN servicos ON servicos.id = agendamentos.fk_servico where agendamentos.fk_funcionario = ?'
         const [agendamentos] = await pool.query(selectQuery,[id]);
 
         return agendamentos || false;

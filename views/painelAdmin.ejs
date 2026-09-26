@@ -1,10 +1,197 @@
 <%- include(partials + 'header-selector.ejs')%>
 
-    <div class="admin-side-bar">
-        <a href="/admin/servicos">Serviços</a>
-        <a href="/admin/funcionarios">Funcionarios</a>
-        <a href="/admin/agendamentos">Agendamentos</a>
-        <a href="/admin/clientes">Clientes</a>
+    <main class="admin-container">
+        <aside class="admin-side-bar" aria-label="Navegação administrativa">
+            <button type="button" id="b-servicos" data-section="servicos">Serviços</button>
+            <button type="button" id="b-funcionarios" data-section="funcionarios">Funcionários</button>
+            <button type="button" id="b-agendamentos" data-section="agendamentos">Histórico de agendamentos</button>
+            <button type="button" id="b-clientes" data-section="clientes">Clientes</button>
+        </aside>
+
+        <section class="admin-content">
+            <h1>Painel administrativo</h1>
+            <p>Selecione uma seção para consultar os dados.</p>
+        </section>
+    </main>
+
+    <div class="admin-modal-backdrop" id="admin-modal-backdrop" hidden>
+        <section class="janela-flutuante admin-window" id="janela-flutuante" role="dialog" aria-modal="true" aria-labelledby="admin-window-title">
+            <div class="admin-window-header">
+                <h2 id="admin-window-title"></h2>
+                <button type="button" class="admin-close" id="admin-close" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="admin-list" id="admin-list" aria-live="polite"></div>
+        </section>
     </div>
+
+    <script>
+        const secoesAdmin = {
+            servicos: { title: 'Serviços', path: '/administrativo/servicos' },
+            funcionarios: { title: 'Funcionários', path: '/administrativo/funcionarios' },
+            agendamentos: { title: 'Histórico de agendamentos', path: '/administrativo/agendamentos' },
+            clientes: { title: 'Clientes', path: '/administrativo/clientes' }
+        };
+
+        const modalBackdrop = document.getElementById('admin-modal-backdrop');
+        const modalTitle = document.getElementById('admin-window-title');
+        const adminList = document.getElementById('admin-list');
+
+        function adicionarCampo(card, label, value) {
+            if (!value || !card || !label) return;
+
+            const row = document.createElement('p');
+            const name = document.createElement('strong');
+            name.textContent = `${label}: `;
+            row.append(name, document.createTextNode(String(value)));
+            card.appendChild(row);
+        }
+
+    function adicionarBotao(card, name, funct){
+        if(!funct || !name || !card) return;
+
+        const botao = document.createElement("button");
+        botao.textContent = name;
+        botao.onclick = funct
+        card.appendChild(botao)
+    }
+
+        function carregarInfo(section, entry) {
+            const card = document.createElement('article');
+            card.className = 'admin-entry';          
+
+            if (section === 'servicos') {
+                adicionarCampo(card,'ID', entry.id)
+                adicionarCampo(card, 'Serviço', entry.nome);
+                adicionarCampo(card, 'Atendente', entry.nome_funcionario);
+                
+                adicionarCampo(card, 'Preço', 
+                entry.preco == null ? '' : `R$ ${entry.preco}`);
+
+                adicionarCampo(card, 'Duração', 
+                entry.duracao == null ? '' : `${entry.duracao} min`);
+                
+                adicionarCampo(card, 'Status', 
+                entry.ativo === false || entry.ativo === 0 ? 'Inativo' : 'Ativo');
+                
+                adicionarBotao(card,'Editar serviço',()=>{
+                    //Criar outra janela para a edição do serviço 
+                    //OU transformar os p's em inputs e resolver tudo com o fetch
+                })
+                adicionarBotao(card,
+                    entry.ativo === false || entry.ativo === 0? 'Ativar serviço' : 'Desativar serviço',
+                    async ()=>{
+                        const response = await fetch(`/servico/mudarstatus/${entry.id}`,{method:'POST'});
+                        if(response.ok){
+                            window.location.reload();
+                            alert(`Status do serviço alterado!`)
+                            return;
+                        }
+
+                        alert('Erro ao alterar o status do serviço')
+                    }
+                )
+
+            } else if (section === 'funcionarios') {
+                adicionarCampo(card,'ID', entry.id)
+
+                adicionarCampo(card, 'Funcionário', entry.nome);
+                adicionarCampo(card, 'Acesso', entry.acesso);
+                
+                adicionarBotao(card,'Visualizar agendamentos', async()=>{
+                    modalTitle.textContent = `Agendamentos de ${entry.nome}`;
+                    modalBackdrop.hidden = false;
+                    showMessage('Carregando agendamentos...');
+
+                    try {
+                        const response = await fetch(`/funcionario/agendamentos/${entry.id}`, { method: 'GET' });
+                        const result = await response.json();
+                        if (!response.ok) throw new Error(typeof result === 'string' ? result : 'Não foi possível carregar os agendamentos.');
+
+                        if (!Array.isArray(result) || result.length === 0) {
+                            showMessage('Este funcionário não possui agendamentos.');
+                            return;
+                        }
+
+                        adminList.replaceChildren(...result.map(agendamento => carregarInfo('agendamentos', agendamento)));
+                    } catch (error) {
+                        showMessage(error.message || 'Ocorreu um erro ao carregar os agendamentos.');
+                    }
+                });
+                adicionarBotao(card,'Visualizar serviços');
+                adicionarBotao(card,'Suspender funcionário');
+
+            } else if (section === 'agendamentos') {
+                adicionarCampo(card,'ID', entry.id)
+
+                adicionarCampo(card, 'Serviço', entry.nome_servico);
+                adicionarCampo(card, 'Funcionário', entry.nome_funcionario);
+                adicionarCampo(card, 'Cliente', entry.nome_cliente);
+                adicionarCampo(card, 'Horário', entry.horario || entry.hora);
+                adicionarCampo(card, 'Status', entry.aStatus);
+
+                adicionarBotao(card, 'Mudar status do agendamento');
+                adicionarBotao(card, 'Gerenciar horários');
+                adicionarBotao(card,'Mudar funcionario');
+                
+            } else if (section === 'clientes') {
+                adicionarCampo(card,'ID', entry.id)
+
+                adicionarCampo(card, 'Cliente', entry.nome);
+                adicionarCampo(card, 'Telefone', entry.telefone);
+                adicionarCampo(card, 'E-mail', entry.email);
+
+                adicionarBotao(card,'Contatar cliente');
+                adicionarBotao(card,'Visualizar agendamentos do cliente');
+                adicionarBotao(card,'Banir cliente');
+
+            }
+
+            return card;
+        }
+
+        function showMessage(message) {
+            const text = document.createElement('p');
+            text.className = 'admin-message';
+            text.textContent = message;
+            adminList.replaceChildren(text);
+        }
+
+        async function loadSection(section) {
+            const config = secoesAdmin[section];
+            if (!config) return;
+
+            modalTitle.textContent = config.title;
+            modalBackdrop.hidden = false;
+            showMessage('Carregando...');
+
+            try {
+                const response = await fetch(config.path, { method: 'GET' });
+                if (!response.ok) throw new Error('Não foi possível carregar os dados.');
+
+                const entries = await response.json();
+
+                if (!Array.isArray(entries) || entries.length === 0) {
+                    showMessage('Nenhum registro encontrado.');
+                    return;
+                }
+
+                adminList.replaceChildren(...entries.map(entry => carregarInfo(section, entry)));
+            } catch (error) {
+                showMessage(error.message || 'Ocorreu um erro ao carregar os dados.');
+            }
+        }
+
+        document.querySelectorAll('.admin-side-bar button[data-section]').forEach(button => {
+            button.addEventListener('click', () => loadSection(button.dataset.section));
+        });
+
+        document.getElementById('admin-close').addEventListener('click', () => {
+            modalBackdrop.hidden = true;
+        });
+
+        modalBackdrop.addEventListener('click', event => {
+            if (event.target === modalBackdrop) modalBackdrop.hidden = true;
+        });
+    </script>
 </body>
 </html>

@@ -20,6 +20,6 @@ router.get('/:sid',ServicosController.getServiceById);
 router.get('/detalhar/:sid',authorize('funcionario','admin'),ServicosController.detalhar)
 router.get('/:sid/horarios',authorize('funcionario','admin'),isSameFuncionario,ServicosController.getHorarios);
 
-router.delete('/apagar/:sid',authorize('funcionario','admin'),isSameFuncionario,ServicosController.desativarServico)
+router.post('/mudarstatus/:sid',authorize('funcionario','admin'),isSameFuncionario,ServicosController.mudarStatus)
 
 module.exports = router
