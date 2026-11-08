@@ -18,9 +18,15 @@ class ServicosService{
         return horarios || [];
     }
     static async getServiceById(id){
+
+        const conn = await pool.getConnection();
+
+        conn.beginTransaction
+
         const selectQuery = 'SELECT * FROM servicos WHERE id = ?';
-        const [[servico]] = await pool.query(selectQuery,[id]);
-        console.log(servico)
+        const [[servico]] = await conn.query(selectQuery, [id]);
+        
+        if (!servico) { await conn.rollback(); return false; } //o rollback descarta o rascunho
         servico.horarios = await this.getHorarios(id);
         
         return servico || false;

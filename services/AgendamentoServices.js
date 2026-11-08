@@ -34,54 +34,102 @@ class AgendamentoService{
     }
 
     static async cancelarAgendamento(sid, user){
+        if(!user || !sid) return false;
         
-        if(!user) return false;
+        const conn = await pool.getConnection();
+        try {
 
-        const agendamento = await this.getAgendamentoByID(sid);
-        if(!agendamento) return false;
-        const horario = await ServicosService.getHorarioBySID(agendamento.fk_horario);
+            await conn.beginTransaction(); //Inicia o rascunho
 
-        if(!horario) return false;
-        //Se nao for nem o cliente e nem o funcionario daquele agendamento,
-        //Então nao pode cancelar
-        const canAlter = await this.canAlterAgendamento(user, agendamento); 
-        if(!canAlter) throw new Error('Você nao tem permissão para cancelar este agendamento')
+            const agendamento = await this.getAgendamentoByID(sid);
+            if(!agendamento) {conn.rollback(); return false};
+
+            const horario = await ServicosService.getHorarioBySID(agendamento.fk_horario);
+
+            if(!horario){ conn.rollback(); return false};
+
+            const canAlter = await this.canAlterAgendamento(user, agendamento); 
+            if(!canAlter) {
+                 //Se nao for nem o cliente e nem o funcionario daquele agendamento,
+                //Então nao pode cancelar
+                conn.rollback();
+                throw new Error('Você nao tem permissão para cancelar este agendamento')
+            }
+            const statusCanceladoQuery = `update agendamentos set aStatus = "Cancelado" where id = ?`
+            const livrarHorarioQuery = `update horarios set ocupado = false where id = ?`
         
-        const statusCanceladoQuery = `update agendamentos set aStatus = "Cancelado" where id = ?`
-        const livrarHorarioQuery = `update horarios set ocupado = false where id = ?`
+            const cancelado = await conn.query(statusCanceladoQuery,[agendamento.id])
+            const horarioLivre = await conn.query(livrarHorarioQuery,[horario.id])  
+            if(cancelado.affectedRows === 0){conn.rollback(); return false} //O agendamento ja estava cancelado
+            if(horarioLivre.affectedRows === 0){conn.rollback(); return false} //O horario ja estava livre
+            
+            conn.commit();
+            return true;
         
-        await pool.query(statusCanceladoQuery,[agendamento.id])
-    
-        await pool.query(livrarHorarioQuery,[horario.id])  
-
-        return true;
+        }catch(e){
+            await conn.rollback();
+            throw e;
+        }finally{
+            conn.release();
+        }
+        
     }
 
     static async deleteAgendamento(sid){
-        await pool.query(`delete from agendamentos where id = ?`,[sid])
+        const conn = await pool.getConnection();
+        try {
+
+            await conn.beginTransaction(); //Inicia o rascunho
+            const [result] = await pool.query(`delete from agendamentos where id = ?`,[sid])
+            if(result.affectedRows === 0){await conn.rollback(); return false}
+        
+            conn.commit();
+
+        }catch(e){
+            await conn.rollback();
+            throw e;
+        }finally{
+            conn.release();
+        }
+        
     }
 
-    static async createAgendamento(servico,horario,clienteId){
 
-       // FAZER COM QUE AO CRIAR UM AGENDAMENTO
-       // SEJA ENVIADO, POR EMAIL, UM LINK COM O TOKEN DE ACESSO
-       // PARA GERENCIAR O AGENDAMENTO
 
-        const userZero = clienteId === 0;
-        const horarioOcupado = horario.ocupado;
-        console.log(!servico,!horario,!clienteId)
-        if(!servico || !horario || (!clienteId && !userZero) || horarioOcupado) return false;
+   static async createAgendamento(servicoId, horarioId, clienteId) {
+    if (!servicoId || !horarioId || clienteId == null) return false; // 0 continua válido
 
-        //insert into agendamentos values(servicoId,horarioId,hora,clienteId,funcionarioId)
+    const conn = await pool.getConnection();
+    try {
+
+        await conn.beginTransaction(); //Inicia o rascunho
         
-        await pool.query(`update horarios set ocupado = true where id = ?`,[horario.id]);
-        console.log('horario ocupado')
-        const insertQuery = `insert into agendamentos(fk_servico, fk_horario, fk_cliente, fk_funcionario) values(?,?,?,?)`
-        await pool.query(insertQuery,[servico.id,horario.id,clienteId,servico.fk_funcionario])
-        console.log('agendamento criado')
+        const servico = await ServicosService.getServiceById(servicoId);
+        console.log(servico)
+        console.log("serviço consultado")
+        // Reserva atômica: só um UPDATE consegue trocar false -> true
+        const [reserva] = await conn.query(
+            'UPDATE horarios SET ocupado = true WHERE id = ? AND ocupado = false',
+            [horarioId]);
         
+            if (reserva.affectedRows === 0) { await conn.rollback(); return false; } // já estava ocupado
+            console.log("status do horario alterado")
+        
+            
+        await conn.query(
+            'INSERT INTO agendamentos (fk_servico, fk_horario, fk_cliente, fk_funcionario) VALUES (?,?,?,?)',
+            [servicoId, horarioId, clienteId, servico.fk_funcionario]);
+
+        await conn.commit(); //Confirma o rascunho  
+
         return true;
+    } catch (err) {
+        await conn.rollback(); //Descarta o rascunho
+        throw err;
+    } finally {
+        conn.release(); //devolve a conexão ao pool
     }
+}
 }
 
 

@@ -90,7 +90,7 @@ class ServicosController{
             
             const cliente = await ClienteService.clienteExiste(nome,telefone,email);
 
-            const agendamento = await AgendamentoService.createAgendamento(servico, horario, cliente.id);
+            const agendamento = await AgendamentoService.createAgendamento(servico.id, horario.id, cliente.id);
 
             //DEPOIS CRIAR UMA FORMA DE CONSULTAR OS AGENDAMENTOS  
 
