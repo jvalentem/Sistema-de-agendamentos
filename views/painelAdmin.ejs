@@ -109,7 +109,9 @@
             const dataCluster = {};
 
             //Variavel importante para alterar os valores na hora que o usuario concluir a edição
+            
             const fieldsToUpdate = [];
+
             for (const row of card.querySelectorAll('[data-editable-field]')) {
                 const field = row.dataset.editableField;
                 const input = row.querySelector('input, select');
@@ -117,6 +119,7 @@
                 if (!input || !input.reportValidity()) return false;
 
                 dataCluster[field] = input.value;
+                
                 fieldsToUpdate.push({ row, field, input });
             }
 
@@ -183,7 +186,6 @@
                 entry.ativo === false || entry.ativo === 0 ? 'Inativo' : 'Ativo');
                 
                 const botaoEditar = adicionarBotao(card, 'Editar serviço', async () => {
-
                     const editing = botaoEditar.dataset.editing === 'true';
                     if (editing) {
                         alterarModoEdicaoServico(card, false);
