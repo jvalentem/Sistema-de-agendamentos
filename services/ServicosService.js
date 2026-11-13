@@ -107,9 +107,9 @@ class ServicosService{
 
         if(!servico) return false;
 
-        const editQuery = 'update servicos set nome = ?, duracao = ?, preco = ? where id = ?';
+        const editQuery = 'update servicos set nome = ?, duracao = ?, preco = ?, funcionario = ? where id = ?';
 
-        await pool.query(editQuery,[info.nome, info.duracao, info.preco, id]);
+        await pool.query(editQuery,[info.nome, info.duracao, info.preco,info.funcionario, id]);
     }
 }
 

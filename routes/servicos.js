@@ -20,6 +20,8 @@ router.get('/:sid',ServicosController.getServiceById);
 router.get('/detalhar/:sid',authorize('funcionario','admin'),ServicosController.detalhar)
 router.get('/:sid/horarios',authorize('funcionario','admin'),isSameFuncionario,ServicosController.getHorarios);
 
-router.post('/mudarstatus/:sid',authorize('funcionario','admin'),isSameFuncionario,ServicosController.mudarStatus)
+router.patch('/mudarstatus/:sid',authorize('funcionario','admin'),isSameFuncionario,ServicosController.mudarStatus)
+
+router.patch('/editar/:sid',authorize('admin'),()=>{console.log("ROTA DE EDIÇÃO CHAMADA")})
 
 module.exports = router

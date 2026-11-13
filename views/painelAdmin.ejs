@@ -36,51 +36,188 @@
         const modalTitle = document.getElementById('admin-window-title');
         const adminList = document.getElementById('admin-list');
 
-        function adicionarCampo(card, label, value) {
+        function adicionarCampo(card, label, value, field = null, fieldValue = value) {
             if (!value || !card || !label) return;
 
             const row = document.createElement('p');
             const name = document.createElement('strong');
+            const content = document.createElement('span');
             name.textContent = `${label}: `;
-            row.append(name, document.createTextNode(String(value)));
+            content.textContent = String(value);
+            if (field) {
+                row.dataset.editableField = field;
+                row.dataset.fieldValue = String(fieldValue ?? '');
+            }
+            row.append(name, content);
             card.appendChild(row);
         }
 
-    function adicionarBotao(card, name, funct){
-        if(!funct || !name || !card) return;
+        function adicionarBotao(card, name, funct) {
+            if (!funct || !name || !card) return;
 
-        const botao = document.createElement("button");
-        botao.textContent = name;
-        botao.onclick = funct
-        card.appendChild(botao)
-    }
+            const botao = document.createElement('button');
+            botao.textContent = name;
+            botao.onclick = funct;
+            card.appendChild(botao);
+            return botao;
+        }
+
+        let funcionariosCache;
+
+        async function carregarFuncionarios() {
+            if (funcionariosCache) return funcionariosCache;
+
+            const response = await fetch(secoesAdmin.funcionarios.path, { method: 'GET' });
+            if (!response.ok) throw new Error('Não foi possível carregar os funcionários.');
+
+            const funcionarios = await response.json();
+            if (!Array.isArray(funcionarios)) throw new Error('A lista de funcionários recebida é inválida.');
+            funcionariosCache = funcionarios;
+            return funcionariosCache;
+        }
+
+        function criarCampoEdicao(row, field, funcionarios) {
+            const input = document.createElement(field === 'funcionario' ? 'select' : 'input');
+            const value = row.dataset.fieldValue;
+
+            if (field === 'funcionario') {
+                funcionarios.forEach(funcionario => {
+                    const option = document.createElement('option');
+                    option.value = String(funcionario.id);
+                    option.textContent = funcionario.nome;
+                    option.selected = String(funcionario.id) === value;
+                    input.appendChild(option);
+                });
+            } else {
+                input.type = field === 'preco' || field === 'duracao' ? 'number' : 'text';
+                input.value = value;
+                input.required = true;
+                if (field === 'preco') input.min = '0';
+                if (field === 'duracao') {
+                    input.min = '1';
+                    input.step = '1';
+                }
+            }
+
+            if (field === 'funcionario') input.required = true;
+            input.name = field;
+            input.setAttribute('aria-label', row.querySelector('strong').textContent.replace(': ', ''));
+            return input;
+        }
+
+        async function concluirEdicaoServico(card, serviceId) {
+            const dataCluster = {};
+
+            //Variavel importante para alterar os valores na hora que o usuario concluir a edição
+            const fieldsToUpdate = [];
+            for (const row of card.querySelectorAll('[data-editable-field]')) {
+                const field = row.dataset.editableField;
+                const input = row.querySelector('input, select');
+
+                if (!input || !input.reportValidity()) return false;
+
+                dataCluster[field] = input.value;
+                fieldsToUpdate.push({ row, field, input });
+            }
+
+            const response = await fetch(`/servico/editar/${serviceId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataCluster)
+            });
+            if (!response.ok) {
+                throw new Error('Não foi possível salvar as alterações do serviço.');
+            }
+
+            fieldsToUpdate.forEach(({ row, field, input }) => {
+                if (field === 'funcionario') {
+                    row.dataset.fieldValue = input.value;
+                    row.querySelector('span').textContent = input.selectedOptions[0].textContent;
+                } else {
+                    row.dataset.fieldValue = input.value;
+                    const value = input.value;
+                    row.querySelector('span').textContent = field === 'preco'
+                        ? `R$ ${value}`
+                        : field === 'duracao' ? `${value} min` : value;
+                }
+            });
+            alterarModoEdicaoServico(card, false);
+            return true;
+        }
+
+        function alterarModoEdicaoServico(card, editing, funcionarios = []) {
+
+            card.querySelectorAll('[data-editable-field]').forEach(row => {
+
+                const field = row.dataset.editableField;
+                const currentValue = row.querySelector('input, select');
+
+                if (editing) {
+                    if (currentValue) return;
+                    row.appendChild(criarCampoEdicao(row, field, funcionarios));
+                    row.querySelector('span').hidden = true;
+                    return;
+                }
+
+                if (currentValue) currentValue.remove();
+                row.querySelector('span').hidden = false;
+            });
+        }
 
         function carregarInfo(section, entry) {
             const card = document.createElement('article');
             card.className = 'admin-entry';          
 
             if (section === 'servicos') {
-                adicionarCampo(card,'ID', entry.id)
-                adicionarCampo(card, 'Serviço', entry.nome);
-                adicionarCampo(card, 'Atendente', entry.nome_funcionario);
+                adicionarCampo(card, 'ID', entry.id);
+                adicionarCampo(card, 'Serviço', entry.nome, 'nome');
+                adicionarCampo(card, 'Atendente', entry.nome_funcionario, 'funcionario', entry.fk_funcionario);
                 
                 adicionarCampo(card, 'Preço', 
-                entry.preco == null ? '' : `R$ ${entry.preco}`);
+                entry.preco == null ? '' : `R$ ${entry.preco}`, 'preco', entry.preco);
 
                 adicionarCampo(card, 'Duração', 
-                entry.duracao == null ? '' : `${entry.duracao} min`);
+                entry.duracao == null ? '' : `${entry.duracao} min`, 'duracao', entry.duracao);
                 
                 adicionarCampo(card, 'Status', 
                 entry.ativo === false || entry.ativo === 0 ? 'Inativo' : 'Ativo');
                 
-                adicionarBotao(card,'Editar serviço',()=>{
-                    //Criar outra janela para a edição do serviço 
-                    //OU transformar os p's em inputs e resolver tudo com o fetch
-                })
+                const botaoEditar = adicionarBotao(card, 'Editar serviço', async () => {
+
+                    const editing = botaoEditar.dataset.editing === 'true';
+                    if (editing) {
+                        alterarModoEdicaoServico(card, false);
+                        botaoEditar.dataset.editing = 'false';
+                        botaoEditar.textContent = 'Editar serviço';
+                        botaoConcluir.hidden = true;
+                        return;
+                    }
+
+                    try {
+                        const funcionarios = await carregarFuncionarios();
+                        alterarModoEdicaoServico(card, true, funcionarios);
+                        botaoEditar.dataset.editing = 'true';
+                        botaoEditar.textContent = 'Cancelar edição';
+                        botaoConcluir.hidden = false;
+                    } catch (error) {
+                        alert(error.message || 'Não foi possível carregar os funcionários.');
+                    }
+                });
+                const botaoConcluir = adicionarBotao(card, 'Concluir edição', async () => {
+                    try {
+                        if (!await concluirEdicaoServico(card, entry.id)) return;
+                        botaoEditar.dataset.editing = 'false';
+                        botaoEditar.textContent = 'Editar serviço';
+                        botaoConcluir.hidden = true;
+                    } catch (error) {
+                        alert(error.message || 'Ocorreu um erro ao salvar o serviço.');
+                    }
+                });
+                botaoConcluir.hidden = true;
                 adicionarBotao(card,
                     entry.ativo === false || entry.ativo === 0? 'Ativar serviço' : 'Desativar serviço',
                     async ()=>{
-                        const response = await fetch(`/servico/mudarstatus/${entry.id}`,{method:'POST'});
+                        const response = await fetch(`/servico/mudarstatus/${entry.id}`,{method:'PATCH'});
                         if(response.ok){
                             window.location.reload();
                             alert(`Status do serviço alterado!`)

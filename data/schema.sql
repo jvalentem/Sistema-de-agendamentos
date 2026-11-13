@@ -59,3 +59,5 @@ CREATE TABLE IF NOT EXISTS agendamentos(
     FOREIGN KEY (fk_servico) REFERENCES servicos(id),
     FOREIGN KEY(fk_horario) REFERENCES horarios(id)
 );
+
+
