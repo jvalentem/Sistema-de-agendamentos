@@ -70,7 +70,7 @@ Aplicação web para **gerenciar serviços e agendamentos**, em que empresas ou 
 
 | Camada | Tecnologias |
 | --- | --- |
-| Back-end | Node.js, Express, Express Session, Socket.IO |
+| Back-end | Node.js, Express, Express Session|
 | Front-end | EJS, HTML5, CSS3, JavaScript |
 | Banco de dados | MySQL |
 
