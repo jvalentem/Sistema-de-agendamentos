@@ -19,4 +19,5 @@ router.get('/agendamentos',AdminController.getAgendamentos);
 router.get('/clientes',AdminController.getClientes)
 
 
+
 module.exports = router

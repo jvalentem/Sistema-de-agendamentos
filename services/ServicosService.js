@@ -106,16 +106,15 @@ class ServicosService{
         const servico = await this.getServiceById(id);
 
         if(!servico) return false;
-        console.log(info);
+
+
         const editQuery = 'update servicos set nome = ?, duracao = ?, preco = ?, fk_funcionario = ? where id = ?';
 
-        const result = await pool.query(editQuery,[info.nome, info.duracao, info.preco,info.funcionario, id])
+        const result = await pool.query(editQuery,[info.nome, info.duracao, info.preco,(info.funcionario || servico.fk_funcionario), id])
         
         
 
         return result;
-        //retornar resultado da query
-
     }
 }
 

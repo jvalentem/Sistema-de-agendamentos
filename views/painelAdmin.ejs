@@ -67,6 +67,7 @@
         async function carregarFuncionarios() {
             if (funcionariosCache) return funcionariosCache;
 
+            //puxa os funcionarios do servidor
             const response = await fetch(secoesAdmin.funcionarios.path, { method: 'GET' });
             if (!response.ok) throw new Error('Não foi possível carregar os funcionários.');
 
@@ -122,7 +123,7 @@
                 
                 fieldsToUpdate.push({ row, field, input });
             }
-
+            console.log('DATACLUSTER:', dataCluster)
             const response = await fetch(`/servico/editar/${serviceId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -235,7 +236,10 @@
 
                 adicionarCampo(card, 'Funcionário', entry.nome);
                 adicionarCampo(card, 'Acesso', entry.acesso);
-                
+
+                const ativo = entry.ativo? 'ATIVO' : 'INATIVO'
+
+                adicionarCampo(card, 'Status do funcionario', ativo);
                 adicionarBotao(card,'Visualizar agendamentos', async()=>{
                     modalTitle.textContent = `Agendamentos de ${entry.nome}`;
                     modalBackdrop.hidden = false;
@@ -256,8 +260,29 @@
                         showMessage(error.message || 'Ocorreu um erro ao carregar os agendamentos.');
                     }
                 });
-                adicionarBotao(card,'Visualizar serviços');
-                adicionarBotao(card,'Suspender funcionário');
+                adicionarBotao(card,'Visualizar serviços',async()=>{
+                    modalTitle.textContent = `Serviços de ${entry.nome}`;
+                    modalBackdrop.hidden = false;
+                    showMessage('Carregando serviços...');
+
+                    try{
+                        const response = await fetch(`/funcionario/${entry.id}/servicos`, {method:'GET'});
+
+                        const result = await response.json();
+                        console.log(result)
+                        if (!response.ok) throw new Error(typeof result === 'string' ? result : 'Não foi possível carregar os serviços.');
+
+                        if (!Array.isArray(result) || result.length === 0) {
+                            showMessage('Este funcionário não possui serviços atribuidos.');
+                            return;
+                        }
+
+                        adminList.replaceChildren(...result.map(servico => carregarInfo('servicos', servico)));
+
+
+                    }catch(e){if(e) throw e}
+                });
+                adicionarBotao(card,'Suspender funcionário', async()=>{});
 
             } else if (section === 'agendamentos') {
                 adicionarCampo(card,'ID', entry.id)

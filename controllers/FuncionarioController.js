@@ -7,11 +7,16 @@ class FuncionarioController{
     static async getFuncionarioServices(req,res){
         try{
             const currentUser = req.session.user;
-            const id = currentUser.id;
+            const id = currentUser.acesso == 'funcionario'? currentUser.id : req.params.id;
+
+            console.log(id);
 
             const servicos = await FuncionarioService.getFuncionarioServices(id);
 
+            if(req.session.user.acesso === 'admin') return res.json(servicos);
+
             return res.render('seus-servicos',{servicos});
+
         }catch(e){return res.status(400).json({error_message:e})}
     }
 

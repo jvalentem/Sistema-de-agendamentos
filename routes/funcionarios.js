@@ -15,6 +15,8 @@ router.use(
 
 router.get('/servicos',defineSession(),FuncionarioController.getFuncionarioServices)
 
+router.get('/:id/servicos',defineSession(),authorize('admin'),FuncionarioController.getFuncionarioServices);
+
 router.get('/agendamentos/:funcionarioId',FuncionarioController.getAgenda)
 
 router.get('/agendamentos',FuncionarioController.getAgenda);
