@@ -105,13 +105,20 @@ class ServicosController{
 
     static async editar(req,res){
        
-        const serviceId = req.params.sid;
-        const info = req.body
-        if(!serviceId || !info) return false
-        
-        const response = await ServicosService.editarServico(serviceId,info);
+        try{
+            const serviceId = req.params.sid;
+            const info = req.body
+            if(!serviceId || !info) return false
 
-        return res.status(200).json('Sucesso!');
+            const response = await ServicosService.editarServico(serviceId,info)
+
+        
+            return res.status(200).json('Sucesso!');
+
+        }catch(e){
+            if(e) throw new Error(e)
+        }
+    
     }
 
 }

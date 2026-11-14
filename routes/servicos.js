@@ -22,6 +22,6 @@ router.get('/:sid/horarios',authorize('funcionario','admin'),isSameFuncionario,S
 
 router.patch('/mudarstatus/:sid',authorize('funcionario','admin'),isSameFuncionario,ServicosController.mudarStatus)
 
-router.patch('/editar/:sid',authorize('admin'),()=>{console.log("ROTA DE EDIÇÃO CHAMADA")})
+router.patch('/editar/:sid',authorize('admin'),ServicosController.editar)
 
 module.exports = router
