@@ -141,6 +141,17 @@ Routes → Middlewares → Controllers → Services → MySQL
    ```
 
 6. Acesse no navegador: `http://localhost:3000`
+7. Para acesso como administrador ou funcionario, acesse: `http://localhost:3000/usuario/acesso-especial`
+
+   Use um dos logins de teste abaixo:
+
+   | Perfil | Login | Senha |
+   | --- | --- | --- |
+   | Funcionário | `funcionario` | `123` |
+   | Funcionário | `funcionario2` | `123` |
+   | Administrador | `admin` | `123` |
+
+   > ⚠️ Credenciais de teste, apenas para uso em ambiente local de desenvolvimento. Nunca as utilize em uma versão publicada online.
 
 ---
 
