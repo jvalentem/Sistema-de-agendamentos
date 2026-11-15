@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,50 +7,65 @@
     <title>Faça login no sistema de agendamento</title>
 </head>
 <body>
-    <h2>Sistema basico de login</h2>
-    <div class="error-message-box">
-        <h3 class="error-message"></h3>
-    </div>
-    <form method="">
-        <input type="text" id="nome" name="nome">
-        <input type="password" name="senha" id="senha">
-        <button type="submit" id="login">Entrar</buttonb>
-    </form>
+    <main class="login-page">
+        <section class="modal-card" aria-labelledby="login-title">
+            <header class="modal-header">
+                <div>
+                    <p class="eyebrow">Sistema de agendamentos</p>
+                    <h2 id="login-title">Acesso especial</h2>
+                </div>
+            </header>
+            <p class="service-description">Entre com seu usuário e senha para continuar.</p>
+
+            <div class="error-message-box" role="alert" hidden>
+                <p class="error-message"></p>
+            </div>
+
+            <form class="form-agendamento" id="login-form" action="/usuario/login" method="post">
+                <label for="nome">Nome de usuário
+                    <input type="text" id="nome" name="nome" autocomplete="username" required>
+                </label>
+                <label for="senha">Senha
+                    <input type="password" name="senha" id="senha" autocomplete="current-password" required>
+                </label>
+                <button type="submit" id="login" class="submit-button">Entrar</button>
+            </form>
+        </section>
+    </main>
 
     <script>
-        const form = document.querySelector('form');
-        const submit = document.getElementById('login')
+        const form = document.getElementById('login-form');
+        const submit = document.getElementById('login');
+        const errorMessageBox = document.querySelector('.error-message-box');
+        const errorMessage = errorMessageBox.querySelector('.error-message');
 
-        function login(){
-            const nome = form.querySelector('input#nome').value;
-            const senha = form.querySelector('input#senha').value;
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            errorMessageBox.hidden = true;
+            submit.disabled = true;
+            submit.textContent = 'Entrando...';
 
-            fetch('/usuario/login',{
-                method:'POST',
-                headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-                body: JSON.stringify({nome,senha})
-            })
-            .then(res => {
-                if(!res.ok) return res.json().then(data => {throw new Error(data.error_message)})
-                
-                return res.json();
-            })
-            .then(details => {
+            try{
+                const nome = form.querySelector('#nome').value;
+                const senha = form.querySelector('#senha').value;
+                const response = await fetch('/usuario/login',{
+                    method:'POST',
+                    headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+                    body: JSON.stringify({nome,senha})
+                });
+                const details = await response.json();
+                if(!response.ok) throw new Error(details.error_message || 'Não foi possível entrar.');
+                if(!details.redirectTo) throw new Error('Não foi possível identificar a página de destino.');
+
                 window.location.href = details.redirectTo;
-            }).catch(err=>{
-                 const errorMessageBox = document.querySelector('.error-message-box');
-                 const errorMessage = errorMessageBox.querySelector('h3');
-                 errorMessage.textContent = `Erro: ${err.message}`;
-            })
-        }
-        
-        form.addEventListener('submit',e=>{
-            e.preventDefault();
-            login();
-        })
-        
-        // form.onsubmit = ()=> login();
-        // submit.onclick = ()=> login();
+            }catch(error){
+                errorMessage.textContent = error.message || 'Ocorreu um erro ao entrar.';
+                errorMessageBox.hidden = false;
+            }finally{
+                submit.disabled = false;
+                submit.textContent = 'Entrar';
+            }
+        });
     </script>
 </body>
 </html>

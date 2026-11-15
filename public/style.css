@@ -508,3 +508,49 @@ header a:hover {
 #detalhes-agendamento[hidden] {
     display: none;
 }
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.login-page .modal-card {
+    width: min(440px, 100%);
+}
+
+.login-page .modal-header {
+    margin-bottom: 0.75rem;
+}
+
+.login-page .modal-header h2 {
+    color: #111827;
+}
+
+.login-page .service-description {
+    margin-bottom: 1.5rem;
+}
+
+.error-message-box {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.error-message-box[hidden] {
+    display: none;
+}
+
+.error-message {
+    margin: 0;
+}
+
+.submit-button:disabled {
+    cursor: wait;
+    opacity: 0.75;
+}
