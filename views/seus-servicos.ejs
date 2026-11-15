@@ -2,9 +2,15 @@
 
 <main class="servico-container">
     <h2>Seus serviços:</h2>
-    <div class="janela-flutuante" id="horarios" hidden>
-        <div id="horarios-box">
-        </div>
+    <div class="admin-modal-backdrop" id="horarios" hidden aria-hidden="true">
+        <section class="janela-flutuante admin-window" role="dialog" aria-modal="true" aria-labelledby="horarios-title">
+            <div class="admin-window-header">
+                <h2 id="horarios-title">Horários do serviço</h2>
+                <button type="button" class="admin-close" id="horarios-close" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="admin-list" id="horarios-box" aria-live="polite">
+            </div>
+        </section>
     </div>
     
     <%servicos.forEach(s =>{%>
@@ -29,40 +35,34 @@
     const visualizarHorariosButtons = document.querySelectorAll('button.visualizar-horarios');   
     //Windows
     const horariosWindow = document.getElementById('horarios');
-    
-    //Essential Functions
-    function toggleWindow(mode){
+    const horariosBox = document.getElementById('horarios-box');
+    const horariosCloseButton = document.getElementById('horarios-close');
 
-        //Se estiver no modo "view", o funcionario quer ver a tabela de horarios
-        if(mode === 'view'){
-            if(horariosWindow.hasAttribute('hidden')){
-                horariosWindow.removeAttribute('hidden');
-                return
-            }
-            horariosWindow.setAttribute('hidden','true');
-            return
-        }
-        
+    function closeHorariosWindow(){
+        horariosWindow.hidden = true;
+        horariosWindow.setAttribute('aria-hidden', 'true');
     }
-    
+
     
     function defineHorarios(horarios){
-        if(!horarios) return false;
+        horariosBox.replaceChildren();
+        if(horarios.length === 0){
+            const emptyMessage = document.createElement('p');
+            emptyMessage.className = 'admin-message';
+            emptyMessage.textContent = 'Nenhum horário disponível para este serviço.';
+            horariosBox.appendChild(emptyMessage);
+            return;
+        }
+
         horarios.forEach(h =>{
             const horarioDiv = document.createElement('div');
-
             const horarioText = document.createElement('p');
-            const servicoId = h.fk_servico;
-            
             horarioText.textContent = h.hora;
             horarioDiv.setAttribute('class','horario');
             horarioDiv.setAttribute('id',h.id);
-            
-           
-            horarioDiv.appendChild(horarioText);            
-            horariosWindow.appendChild(horarioDiv);
+            horarioDiv.appendChild(horarioText);
+            horariosBox.appendChild(horarioDiv);
         })
-        
     }
 
     //Event Listeneres
@@ -73,19 +73,28 @@
             
             if(!serviceId) return false;
 
-            const path = `/servico/${serviceId}/horarios`
-            const response = await fetch(path,{method:'GET'});
-            
-            const horarios = await response.json();
+            try{
+                const response = await fetch(`/servico/${serviceId}/horarios`,{method:'GET'});
+                if(!response.ok) throw new Error('Não foi possível carregar os horários.');
+                const horarios = await response.json();
+                if(!Array.isArray(horarios)) throw new Error('A resposta de horários é inválida.');
 
-            defineHorarios(horarios)
-            toggleWindow('view');
-        
-            //Voce deixou as janelas visiveis, e os horarios?
-            //Criar um metodo define para a tela de horarios
-            //e incluir o togglewindow
+                defineHorarios(horarios);
+                horariosWindow.hidden = false;
+                horariosWindow.setAttribute('aria-hidden', 'false');
+            }catch(error){
+                alert(error.message || 'Não foi possível carregar os horários.');
+            }
         }   
     })
+
+    horariosCloseButton.addEventListener('click', closeHorariosWindow);
+    horariosWindow.addEventListener('click', event => {
+        if(event.target === horariosWindow) closeHorariosWindow();
+    });
+    document.addEventListener('keydown', event => {
+        if(event.key === 'Escape' && !horariosWindow.hidden) closeHorariosWindow();
+    });
     
 </script>
 </body>
