@@ -169,6 +169,7 @@ Routes → Middlewares → Controllers → Services → MySQL
 - [FEITO] Implementar criptografia de senhas com bcrypt
 - [ ] Fortalecer a segurança da aplicação
 - [ ] Publicação online (deploy)
+- [ ] Refatorar a tabela de horários, acrescentando datas também
 
 ---
 
