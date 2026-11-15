@@ -56,7 +56,7 @@ class FuncionarioController{
                     error_message:'O funcionário possui agendamentos em andamento.'
                 });
             }
-
+    
             const message = result.ativo
                 ? 'Funcionário retornado com sucesso. Os serviços continuam desativados.'
                 : 'Funcionário suspenso com sucesso.';
