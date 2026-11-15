@@ -21,5 +21,6 @@ router.get('/agendamentos/:funcionarioId',FuncionarioController.getAgenda)
 
 router.get('/agendamentos',FuncionarioController.getAgenda);
 
+router.patch('/:id/mudarStatus',authorize('admin'),FuncionarioController.mudarStatus)
 
 module.exports = router;

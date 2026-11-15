@@ -33,6 +33,52 @@ class FuncionarioService{
 
         return agendamentos || false;
     }
+
+    static async mudarStatus(id){
+        if(!Number.isInteger(Number(id)) || Number(id) <= 0) return false;
+
+        const conn = await pool.getConnection();
+        try{
+            await conn.beginTransaction();
+
+            const [[funcionario]] = await conn.query(
+                'select id, ativo from usuarios where id = ? and acesso = ? for update',
+                [id, 'funcionario']
+            );
+            if(!funcionario){
+                await conn.rollback();
+                return false;
+            }
+
+            const funcionarioAtivo = funcionario.ativo === true || funcionario.ativo === 1;
+            if(funcionarioAtivo){
+                const [[agendamentoAtivo]] = await conn.query(
+                    'select id from agendamentos where fk_funcionario = ? and aStatus = ? limit 1',
+                    [id, 'Em andamento']
+                );
+                if(agendamentoAtivo){
+                    await conn.rollback();
+                    return { bloqueado: true };
+                }
+
+                await conn.query('update usuarios set ativo = false where id = ?', [id]);
+                await conn.query(
+                    'update servicos set ativo = false where fk_funcionario = ? and ativo = true',
+                    [id]
+                );
+            }else{
+                await conn.query('update usuarios set ativo = true where id = ?', [id]);
+            }
+
+            await conn.commit();
+            return { ativo: !funcionarioAtivo };
+        }catch(error){
+            await conn.rollback();
+            throw error;
+        }finally{
+            conn.release();
+        }
+    }
 }
 
 module.exports = {FuncionarioService}

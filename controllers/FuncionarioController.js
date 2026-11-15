@@ -21,7 +21,6 @@ class FuncionarioController{
     }
 
     static async getAgenda(req,res){
-        console.log('router')
        try{
             const user = req.session.user
 
@@ -39,6 +38,36 @@ class FuncionarioController{
 
        }catch(e){return res.status(400).json({error_message:e});}
     }
+
+
+    static async mudarStatus(req,res){
+        try{
+            const id = Number(req.params.id);
+            if(!Number.isInteger(id) || id <= 0){
+                return res.status(400).json({error_message:'ID de funcionário inválido.'});
+            }
+
+            const result = await FuncionarioService.mudarStatus(id);
+            if(!result){
+                return res.status(404).json({error_message:'Funcionário não encontrado.'});
+            }
+            if(result.bloqueado){
+                return res.status(409).json({
+                    error_message:'O funcionário possui agendamentos em andamento.'
+                });
+            }
+
+            const message = result.ativo
+                ? 'Funcionário retornado com sucesso. Os serviços continuam desativados.'
+                : 'Funcionário suspenso com sucesso.';
+            return res.status(200).json({message, ativo:result.ativo});
+        }catch(error){
+            console.error('Erro ao alterar status do funcionário:', error);
+            return res.status(500).json({error_message:'Erro ao alterar status do funcionário.'});
+        }
+    }
+
+
 }
 
 module.exports = {FuncionarioController}

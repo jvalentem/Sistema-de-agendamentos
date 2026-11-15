@@ -105,6 +105,7 @@ class AgendamentoService{
         await conn.beginTransaction(); //Inicia o rascunho
         
         const servico = await ServicosService.getServiceById(servicoId);
+        if (!servico || !servico.ativo) { await conn.rollback(); return false; }
         console.log(servico)
         console.log("serviço consultado")
         // Reserva atômica: só um UPDATE consegue trocar false -> true

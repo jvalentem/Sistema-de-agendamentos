@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS usuarios(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255) NOT NULL,
     senha VARCHAR (255) NOT NULL,
-    acesso VARCHAR(255) NOT NULL
+    acesso VARCHAR(255) NOT NULL,
+    ativo BOOLEAN NOT NULL DEFAULT true
 );
 
 INSERT INTO usuarios(nome,senha,acesso) VALUES ('Funcionario','123','funcionario');

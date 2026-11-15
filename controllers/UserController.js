@@ -18,6 +18,9 @@ class UserController{
 
             const user = await UserService.validateUser(nome,senha);
             if(!user) return res.status(403).json({error_message:'Acesso negado!'});
+            if(user.acesso === 'funcionario' && (user.ativo === 0 || user.ativo === false)){
+                return res.status(403).json({error_message:'A conta deste funcionário está suspensa.'});
+            }
 
             const acesso = user.acesso;
 
