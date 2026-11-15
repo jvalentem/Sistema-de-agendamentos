@@ -2,6 +2,7 @@ const { ClienteService } = require('../services/ClienteService');
 const { FuncionarioService } = require('../services/FuncionarioService');
 const {UserService} = require('../services/UserService');
 
+
 class UserController{
 
     static async logout(req,res){
@@ -17,7 +18,9 @@ class UserController{
             const {nome,senha} = req.body;
 
             const user = await UserService.validateUser(nome,senha);
+            
             if(!user) return res.status(403).json({error_message:'Acesso negado!'});
+
             if(user.acesso === 'funcionario' && (user.ativo === 0 || user.ativo === false)){
                 return res.status(403).json({error_message:'A conta deste funcionário está suspensa.'});
             }

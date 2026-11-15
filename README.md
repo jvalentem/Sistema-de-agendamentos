@@ -125,7 +125,7 @@ Routes → Middlewares → Controllers → Services → MySQL
    npm install
    ```
 
-3. Crie o banco de dados no MySQL executando o script `data/schema.sql` (pelo terminal ou por uma ferramenta como o MySQL Workbench).
+3. Crie o banco de dados no MySQL executando o script `data/schema.sql` (pelo terminal ou por uma ferramenta como o MySQL Workbench). Lembre-se que é necessário que o serviço do MySQL esteja ligado no XAMPP
 
 4. Crie o arquivo `data/.env` com os dados de conexão do seu MySQL:
    ```env
@@ -133,15 +133,21 @@ Routes → Middlewares → Controllers → Services → MySQL
    DB_USER=seu_usuario
    DB_NAME=nome_do_banco
    DB_PORT=3306
+   GENERAL_PASSWORD = 123
    ```
 
-5. Inicie a aplicação:
+5. Alimente o banco
+```bash
+   node /scripts/seed.js
+   ```
+
+6. Inicie a aplicação:
    ```bash
    node index.js
    ```
 
-6. Acesse no navegador: `http://localhost:3000`
-7. Para acesso como administrador ou funcionario, acesse: `http://localhost:3000/usuario/acesso-especial`
+7. Acesse no navegador: `http://localhost:3000`
+8. Para acesso como administrador ou funcionario, acesse: `http://localhost:3000/usuario/acesso-especial`
 
    Use um dos logins de teste abaixo:
 
@@ -158,7 +164,7 @@ Routes → Middlewares → Controllers → Services → MySQL
 ## Próximos passos
 
 - [ ] Finalizar o painel do administrador
-- [ ] Implementar criptografia de senhas com bcrypt
+- [FEITO] Implementar criptografia de senhas com bcrypt
 - [ ] Fortalecer a segurança da aplicação
 - [ ] Publicação online (deploy)
 

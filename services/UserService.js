@@ -1,5 +1,6 @@
 const pool = require('../data/mysql').pool;
 const {ServicosService} = require('./ServicosService');
+const {comparePassword} = require('../utils/password')
 
 class UserService{
 
@@ -12,10 +13,19 @@ class UserService{
     static async validateUser(nome,senha){
         try {
             if(!nome || !senha) return false;
-            const selectQuery = 'select * from usuarios where nome = ? and senha = ?';
-            const [[user]] = await pool.query(selectQuery,[nome,senha]);
+            const selectQuery = 'select * from usuarios where nome = ?';
+            const [[user]] = await pool.query(selectQuery,[nome]);
 
-            return user || false;
+            if(!user) return false; 
+
+            const senhaValida = await comparePassword(
+                senha,
+                user.senha
+            )
+
+            if(!senhaValida) return false;
+
+            return user
         } catch (error) {
             console.log(error)
         }
