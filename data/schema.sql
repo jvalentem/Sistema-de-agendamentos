@@ -17,10 +17,6 @@ CREATE TABLE IF NOT EXISTS usuarios(
     ativo BOOLEAN NOT NULL DEFAULT true
 );
 
-INSERT INTO usuarios(nome,senha,acesso) VALUES ('Funcionario','123','funcionario');
-INSERT INTO usuarios(nome,senha,acesso) VALUES ('Funcionario2','123','funcionario');
-INSERT INTO usuarios(nome,senha,acesso) VALUES ('admin','123','admin');
-
 CREATE TABLE IF NOT EXISTS servicos(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255) NOT NULL,
@@ -31,8 +27,6 @@ CREATE TABLE IF NOT EXISTS servicos(
     ativo boolean not null default true
 );
 
-INSERT INTO servicos(nome,fk_funcionario,preco,duracao) VALUES ('Psicologia',1,45,60);
-INSERT INTO servicos(nome,fk_funcionario,preco,duracao) VALUES ('Ed. Física',2,45,60);
 
 CREATE TABLE IF NOT EXISTS horarios(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -41,11 +35,6 @@ CREATE TABLE IF NOT EXISTS horarios(
     fk_servico INT NOT NULL,
     FOREIGN KEY(fk_servico) REFERENCES servicos(id)
 );
-
-INSERT INTO horarios(hora,fk_servico) VALUES ('15:00',1);
-INSERT INTO horarios(hora,fk_servico) VALUES ('16:00',1);
-INSERT INTO horarios(hora,fk_servico) VALUES ('17:00',2);
-INSERT INTO horarios(hora,fk_servico) VALUES ('18:00',2);
 
 CREATE TABLE IF NOT EXISTS agendamentos(
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
