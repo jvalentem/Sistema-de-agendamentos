@@ -155,6 +155,8 @@ Routes → Middlewares → Controllers → Services → MySQL
    | --- | --- | --- |
    | Funcionário | `funcionario` | `123` |
    | Funcionário | `funcionario2` | `123` |
+   | Funcionário | `funcionario3` | `123`|
+   | Funcionário | `funcionario4` | `123`|
    | Administrador | `admin` | `123` |
 
    > ⚠️ Credenciais de teste, apenas para uso em ambiente local de desenvolvimento. Nunca as utilize em uma versão publicada online.
