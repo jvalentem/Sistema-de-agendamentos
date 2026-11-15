@@ -42,17 +42,17 @@ class AgendamentoService{
             await conn.beginTransaction(); //Inicia o rascunho
 
             const agendamento = await this.getAgendamentoByID(sid);
-            if(!agendamento) {conn.rollback(); return false};
+            if(!agendamento) {await conn.rollback(); return false};
 
             const horario = await ServicosService.getHorarioBySID(agendamento.fk_horario);
 
-            if(!horario){ conn.rollback(); return false};
+            if(!horario){ await conn.rollback(); return false};
 
             const canAlter = await this.canAlterAgendamento(user, agendamento); 
             if(!canAlter) {
                  //Se nao for nem o cliente e nem o funcionario daquele agendamento,
                 //Então nao pode cancelar
-                conn.rollback();
+                await conn.rollback();
                 throw new Error('Você nao tem permissão para cancelar este agendamento')
             }
             const statusCanceladoQuery = `update agendamentos set aStatus = "Cancelado" where id = ?`
@@ -60,10 +60,10 @@ class AgendamentoService{
         
             const cancelado = await conn.query(statusCanceladoQuery,[agendamento.id])
             const horarioLivre = await conn.query(livrarHorarioQuery,[horario.id])  
-            if(cancelado.affectedRows === 0){conn.rollback(); return false} //O agendamento ja estava cancelado
-            if(horarioLivre.affectedRows === 0){conn.rollback(); return false} //O horario ja estava livre
+            if(cancelado.affectedRows === 0){await conn.rollback(); return false} //O agendamento ja estava cancelado
+            if(horarioLivre.affectedRows === 0){await conn.rollback(); return false} //O horario ja estava livre
             
-            conn.commit();
+            await conn.commit();
             return true;
         
         }catch(e){
@@ -77,13 +77,13 @@ class AgendamentoService{
 
     static async deleteAgendamento(sid){
         const conn = await pool.getConnection();
-        try {
 
+        try {
             await conn.beginTransaction(); //Inicia o rascunho
-            const [result] = await pool.query(`delete from agendamentos where id = ?`,[sid])
+            const [result] = await conn.query(`delete from agendamentos where id = ?`,[sid])
             if(result.affectedRows === 0){await conn.rollback(); return false}
         
-            conn.commit();
+            await conn.commit();
 
         }catch(e){
             await conn.rollback();

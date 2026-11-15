@@ -25,7 +25,7 @@ class HorarioService{
     }
     static async apagarHorario(id){
         if(!id) return false;
-        const deleteQuery = `delete from horarios where id = ? a`;
+        const deleteQuery = `delete from horarios where id = ?`;
 
         await pool.query(deleteQuery,[id]);
         return true;

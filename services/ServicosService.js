@@ -19,17 +19,16 @@ class ServicosService{
     }
     static async getServiceById(id){
 
-        const conn = await pool.getConnection();
-
-        conn.beginTransaction
-
-        const selectQuery = 'SELECT * FROM servicos WHERE id = ?';
-        const [[servico]] = await conn.query(selectQuery, [id]);
+        try{
+            const selectQuery = 'SELECT * FROM servicos WHERE id = ?';
+            const [[servico]] = await pool.query(selectQuery, [id]);
         
-        if (!servico) { await conn.rollback(); return false; } //o rollback descarta o rascunho
-        servico.horarios = await this.getHorarios(id);
+            if (!servico)  return false 
+            servico.horarios = await this.getHorarios(id);
+                        
+            return servico || false;
+        }catch(e){throw e}
         
-        return servico || false;
     }
 
     static async getServiceBySID(fkHorario){
