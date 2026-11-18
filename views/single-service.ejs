@@ -14,7 +14,10 @@
             <%servico.horarios.forEach(horario=>{%>
                 <%if(horario.ocupado == false){%>
                     <div class="horario">
-                        <p><%=horario.hora%></p>
+                        <div>
+                            <p>Data: <%=horario.dataAgendamento%></p>
+                            <p>Horário: <%=horario.hora%></p>
+                        </div>
                         <button id=<%= `${horario.id}`%> class="agendamentoButton">Agende nesse horário</button>
                     </div>
                 <%}%>

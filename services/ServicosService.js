@@ -2,6 +2,18 @@ const pool = require('../data/mysql').pool;
 const { FuncionarioService } = require('./FuncionarioService');
 class ServicosService{
 
+
+    static formatDate(dataAgendamento){
+        //RETORNA A DATA FORMATADA DO BANCO
+        if (!dataAgendamento) return;
+        return new Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            timeZone: 'UTC' // evita deslocamento de dia em datas puras YYYY-MM-DD
+        }).format(new Date(dataAgendamento));
+
+    }
     static async createService(info){
         if(!info) return false;
         const insertQuery = 'INSERT INTO servicos(nome,fk_funcionario,preco,duracao) VALUES (?,?,?,?)';
@@ -14,7 +26,7 @@ class ServicosService{
     static async getHorarios(id){
         const selectQuery = 'SELECT horarios.* FROM servicos JOIN horarios ON horarios.fk_servico = servicos.id where servicos.id = ?';
         const [horarios] = await pool.query(selectQuery,[Number(id)]);
-        console.log(horarios);
+        horarios.forEach(h=> h.dataAgendamento = this.formatDate(h.dataAgendamento))
         return horarios || [];
     }
     static async getServiceById(id){

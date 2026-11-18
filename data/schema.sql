@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS horarios(
     hora VARCHAR(255) NOT NULL,
     ocupado BOOLEAN NOT NULL DEFAULT false,
     fk_servico INT NOT NULL,
+    dataAgendamento DATE DEFAULT (CURRENT_DATE),
     FOREIGN KEY(fk_servico) REFERENCES servicos(id)
 );
 
