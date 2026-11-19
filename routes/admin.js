@@ -3,7 +3,6 @@ const router = express.Router();
 const {authorize} = require('../middlewares/authorize');
 const {sessionActive} = require('../middlewares/sessionActive')
 const {AdminController} =  require('../controllers/AdminController');
-const { route } = require('./servicos');
 
 router.use(sessionActive, authorize('admin'));
 
@@ -18,6 +17,10 @@ router.get('/funcionarios',AdminController.getFuncionarios)
 router.get('/agendamentos',AdminController.getAgendamentos);
 router.get('/clientes',AdminController.getClientes)
 
-
+//!!
+router.post('/funcionarios/cadastrar',()=>{})
+router.post('/servicos/cadastrar',(req,res)=>{
+    console.log('cadastrando serviço:',req.body)
+})
 
 module.exports = router

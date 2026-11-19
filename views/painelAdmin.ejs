@@ -6,7 +6,21 @@
             <button type="button" id="b-funcionarios" data-section="funcionarios">Funcionários</button>
             <button type="button" id="b-agendamentos" data-section="agendamentos">Histórico de agendamentos</button>
             <button type="button" id="b-clientes" data-section="clientes">Clientes</button>
+            <br>
+            <br>
+            <button type="button" class="admin-create-button" id="b-cadastrar-funcionario" data-section="cadastro-funcionario">Cadastrar novo funcionário</button>
+            <button type="button" class="admin-create-button" id="b-cadastrar-servico" data-section="cadastro-servico">Cadastrar novo serviço</button>
         </aside>
+
+        <div class="admin-create-window admin-modal-backdrop" id="admin-create-window" hidden>
+            <section class="janela-flutuante admin-window admin-create-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-create-title">
+                <div class="admin-window-header">
+                    <h2 id="admin-create-title"></h2>
+                    <button type="button" class="admin-close" id="admin-create-close" aria-label="Fechar">&times;</button>
+                </div>
+                <form class="create-form" id="create-form"></form>
+            </section>
+        </div>
 
         <section class="admin-content">
             <h1>Painel administrativo</h1>
@@ -35,6 +49,11 @@
         const modalBackdrop = document.getElementById('admin-modal-backdrop');
         const modalTitle = document.getElementById('admin-window-title');
         const adminList = document.getElementById('admin-list');
+        const createBackdrop = document.getElementById('admin-create-window');
+        const createTitle = document.getElementById('admin-create-title');
+        const createForm = document.getElementById('create-form');
+
+        let funcionariosCache;
 
         function adicionarCampo(card, label, value, field = null, fieldValue = value) {
             if (!value || !card || !label) return;
@@ -50,8 +69,18 @@
             }
             row.append(name, content);
             card.appendChild(row);
+            return row
         }
 
+        function adicionarTexto(card,value){
+            if(!card || !value) return false 
+
+            const paragraph = document.createElement('p');
+            paragraph.textContent = value
+            card.appendChild(paragraph)
+
+            return paragraph
+        }
         function adicionarBotao(card, name, funct) {
             if (!funct || !name || !card) return;
 
@@ -62,7 +91,20 @@
             return botao;
         }
 
-        let funcionariosCache;
+        function adicionarInput(form, placeholder, value, type = 'text', name = placeholder, required = true) {
+            if (!form || !placeholder) return false;
+
+            const input = document.createElement('input');
+            input.type = type;
+            input.name = name;
+            input.placeholder = placeholder;
+            input.setAttribute('aria-label', placeholder);
+            input.required = required;
+            if (value) input.value = value;
+
+            form.appendChild(input);
+            return input;
+        }
 
         async function carregarFuncionarios() {
             if (funcionariosCache) return funcionariosCache;
@@ -381,12 +423,116 @@
             }
         }
 
+
+        async function loadCreationForm(creationReason){
+            createForm.replaceChildren();
+            createBackdrop.hidden = false;
+
+            if (creationReason === 'cadastro-funcionario') {
+                createTitle.textContent = 'Cadastrar funcionário';
+                adicionarInput(createForm, 'Nome do funcionário', '', 'text', 'nome');
+                adicionarInput(createForm, 'Senha', '', 'password', 'senha');
+                return;
+            }
+
+            if (creationReason === 'cadastro-servico') {
+                createTitle.textContent = 'Cadastrar serviço';
+                const nomeServico = adicionarInput(createForm, 'Nome do serviço', '', 'text', 'nome');
+
+                const funcionarioSelect = document.createElement('select');
+                funcionarioSelect.name = 'funcionarioId';
+                funcionarioSelect.required = true;
+                funcionarioSelect.setAttribute('aria-label', 'Funcionário atribuído');
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = 'Selecione o funcionário';
+                placeholder.disabled = true;
+                placeholder.selected = true;
+                funcionarioSelect.appendChild(placeholder);
+
+                try {
+                    const funcionarios = await carregarFuncionarios();
+                    funcionarios
+                        .filter(funcionario => funcionario.ativo === true || funcionario.ativo === 1)
+                        .forEach(funcionario => {
+                            const option = document.createElement('option');
+                            option.value = String(funcionario.id);
+                            option.textContent = funcionario.nome;
+                            funcionarioSelect.appendChild(option);
+                        });
+                } catch (error) {
+                    createForm.appendChild(funcionarioSelect);
+                    adicionarMensagemFormulario(error.message || 'Não foi possível carregar os funcionários.');
+                    return;
+                }
+
+                createForm.appendChild(funcionarioSelect);
+                if (funcionarioSelect.options.length === 1) {
+                    placeholder.textContent = 'Nenhum funcionário ativo disponível';
+                    adicionarMensagemFormulario('Cadastre ou reative um funcionário antes de criar um serviço.');
+                }
+               const preco = adicionarInput(createForm, 'Preço (R$)', '', 'number', 'preco');
+                createForm.querySelector('[name="preco"]').min = '0';
+                createForm.querySelector('[name="preco"]').step = '0.01';
+                const duracao = adicionarInput(createForm, 'Duração (minutos)', '', 'number', 'duracao');
+                createForm.querySelector('[name="duracao"]').min = '1';
+                createForm.querySelector('[name="duracao"]').step = '1';
+                adicionarTexto(createForm,'Data disponível para o serviço:');
+                const dataDisponivel = adicionarInput(createForm,'Data do serviço','Data do serviço','date','dataServico',true);
+                adicionarTexto(createForm,'Horário do serviço')
+                const horarioServico = adicionarInput(createForm,'Horário do serviço','','time','horaServico',true)
+
+
+                adicionarBotao(createForm,'Concluir',async ()=>{
+                    //conclusao de serviço
+                    try{
+                        const servico = {
+                        'nomeServico':nomeServico.value, 
+                        'dataServico':dataDisponivel.value,
+                        'funcionarioAtribuido':funcionarioSelect.value,
+                        'horarioServico':horarioServico.value,
+                        'duracaoServico':duracao.value,
+                        'precoServico':preco.value
+                    }
+                        const response = await fetch(`${secoesAdmin.servicos.path}/cadastrar`,
+                        {method:'POST',
+                        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+                        body: JSON.stringify(servico)
+
+                        });
+                        if(!response.ok) return alert ('Nao foi possivel cadastrar o serviço');
+
+                        console.log(response)
+                    }catch(e){if(e) throw e}
+                })
+            }
+        }
+
+        function adicionarMensagemFormulario(message) {
+            const text = document.createElement('p');
+            text.className = 'admin-message';
+            text.textContent = message;
+            createForm.appendChild(text);
+        }
+
         document.querySelectorAll('.admin-side-bar button[data-section]').forEach(button => {
             button.addEventListener('click', () => loadSection(button.dataset.section));
         });
 
+        document.querySelectorAll('.admin-create-button').forEach(button =>{
+            button.addEventListener('click', ()=> loadCreationForm(button.dataset.section))
+        })
+
         document.getElementById('admin-close').addEventListener('click', () => {
             modalBackdrop.hidden = true;
+        });
+
+        document.getElementById('admin-create-close').addEventListener('click', () => {
+            createBackdrop.hidden = true;
+        });
+
+        createBackdrop.addEventListener('click', event => {
+            if (event.target === createBackdrop) createBackdrop.hidden = true;
         });
 
         modalBackdrop.addEventListener('click', event => {
