@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const {ServicosController} = require('../controllers/ServicosController');
-const {AgendamentoService} = require('../services/AgendamentoServices');
 const {HorarioController} = require('../controllers/HorarioController');
 
 const {authorize} = require('../middlewares/authorize');
@@ -18,7 +17,8 @@ router.post('/:sid/horarios/criar',authorize('admin'),HorarioController.createHo
 
 router.get('/:sid',ServicosController.getServiceById);
 router.get('/detalhar/:sid',authorize('funcionario','admin'),ServicosController.detalhar)
-router.get('/:sid/horarios',authorize('funcionario','admin'),isSameFuncionario,ServicosController.getHorarios);
+router.get('/:sid/datas',authorize('funcionario','admin'),isSameFuncionario,ServicosController.getDatas);
+router.get('/:sid/data/:hid/horarios',HorarioController.getHorariosWhereDateIs)
 
 router.patch('/mudarstatus/:sid',authorize('funcionario','admin'),isSameFuncionario,ServicosController.mudarStatus)
 

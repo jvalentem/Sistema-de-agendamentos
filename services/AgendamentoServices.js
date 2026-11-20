@@ -6,14 +6,20 @@ class AgendamentoService{
     static async getAgendamentos(){
         //retorna todo o historico de agendamentos
         //Incluir query para retornar o agendamento completo
-        const selectQuery = 'SELECT agendamentos.*, clientes.nome AS nome_cliente, usuarios.nome AS nome_funcionario, servicos.nome AS nome_servico, horarios.hora AS horario FROM agendamentos JOIN clientes ON clientes.id = agendamentos.fk_cliente JOIN usuarios ON usuarios.id = agendamentos.fk_funcionario JOIN servicos ON servicos.id = agendamentos.fk_servico JOIN horarios ON horarios.id = agendamentos.fk_horario'
+        const selectQuery = 'SELECT agendamentos.*, clientes.nome AS nome_cliente, usuarios.nome AS nome_funcionario, servicos.nome AS nome_servico, horarios.hora AS horario, horarios.dataAgendamento AS dataAgendamento FROM agendamentos JOIN clientes ON clientes.id = agendamentos.fk_cliente JOIN usuarios ON usuarios.id = agendamentos.fk_funcionario JOIN servicos ON servicos.id = agendamentos.fk_servico JOIN horarios ON horarios.id = agendamentos.fk_horario'
         const [agendamentos] = await pool.query(selectQuery);
+        agendamentos.forEach(agendamento => {
+            agendamento.dataAgendamento = ServicosService.formatDate(agendamento.dataAgendamento);
+        });
+        console.log(agendamentos)
         return agendamentos;
     }
     static async getAgendamentoByID(sid){
-        const selectQuery ='SELECT agendamentos.*, clientes.nome AS nome_cliente,usuarios.nome AS nome_funcionario,servicos.nome AS nome_servico, horarios.hora AS horario FROM agendamentos JOIN clientes ON clientes.id = agendamentos.fk_cliente JOIN usuarios ON usuarios.id = agendamentos.fk_funcionario JOIN servicos ON servicos.id = agendamentos.fk_servico JOIN horarios ON horarios.id = agendamentos.fk_horario WHERE agendamentos.id = ?'
+        const selectQuery ='SELECT agendamentos.*, clientes.nome AS nome_cliente,usuarios.nome AS nome_funcionario,servicos.nome AS nome_servico, horarios.hora AS horario, horarios.dataAgendamento AS dataAgendamento FROM agendamentos JOIN clientes ON clientes.id = agendamentos.fk_cliente JOIN usuarios ON usuarios.id = agendamentos.fk_funcionario JOIN servicos ON servicos.id = agendamentos.fk_servico JOIN horarios ON horarios.id = agendamentos.fk_horario WHERE agendamentos.id = ?'
         
         const [[agendamento]] = await pool.query(selectQuery,[sid])
+
+        if (agendamento) agendamento.dataAgendamento = ServicosService.formatDate(agendamento.dataAgendamento);
 
         return agendamento || false;
     }

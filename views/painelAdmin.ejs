@@ -22,6 +22,20 @@
             </section>
         </div>
 
+        <div class="admin-modal-backdrop" id="admin-schedule-backdrop" hidden>
+            <section class="janela-flutuante admin-window admin-create-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-schedule-title">
+                <div class="admin-window-header">
+                    <h2 id="admin-schedule-title">Cadastrar horário</h2>
+                    <button type="button" class="admin-close" id="admin-schedule-close" aria-label="Fechar">&times;</button>
+                </div>
+                <form class="create-form" id="admin-schedule-form">
+                    <input type="date" name="dataAgendamento" aria-label="Data do serviço" required>
+                    <input type="time" name="hora" aria-label="Horário do serviço" required>
+                    <button type="submit">Cadastrar horário</button>
+                </form>
+            </section>
+        </div>
+
         <section class="admin-content">
             <h1>Painel administrativo</h1>
             <p>Selecione uma seção para consultar os dados.</p>
@@ -52,6 +66,8 @@
         const createBackdrop = document.getElementById('admin-create-window');
         const createTitle = document.getElementById('admin-create-title');
         const createForm = document.getElementById('create-form');
+        const scheduleBackdrop = document.getElementById('admin-schedule-backdrop');
+        const scheduleForm = document.getElementById('admin-schedule-form');
 
         let funcionariosCache;
 
@@ -259,7 +275,7 @@
                     }
                 });
                 botaoConcluir.hidden = true;
-                adicionarBotao(card,
+                const botaoMudarStatus = adicionarBotao(card,
                     entry.ativo === false || entry.ativo === 0? 'Ativar serviço' : 'Desativar serviço',
                     async ()=>{
                         const response = await fetch(`/servico/mudarstatus/${entry.id}`,{method:'PATCH'});
@@ -272,7 +288,14 @@
                         alert('Erro ao alterar o status do serviço')
                     }
                 )
-
+                
+                adicionarBotao(card,'Cadastrar novo horário',()=>{
+                    modalBackdrop.hidden = true;
+                    scheduleForm.dataset.serviceId = entry.id;
+                    scheduleForm.reset();
+                    scheduleBackdrop.hidden = false;
+                })
+            
             } 
             else if (section === 'funcionarios') {
 
@@ -477,10 +500,6 @@
                 const duracao = adicionarInput(createForm, 'Duração (minutos)', '', 'number', 'duracao');
                 createForm.querySelector('[name="duracao"]').min = '1';
                 createForm.querySelector('[name="duracao"]').step = '1';
-                adicionarTexto(createForm,'Data disponível para o serviço:');
-                const dataDisponivel = adicionarInput(createForm,'Data do serviço','Data do serviço','date','dataServico',true);
-                adicionarTexto(createForm,'Horário do serviço')
-                const horarioServico = adicionarInput(createForm,'Horário do serviço','','time','horaServico',true)
 
 
                 adicionarBotao(createForm,'Concluir',async ()=>{
@@ -488,21 +507,21 @@
                     try{
                         const servico = {
                         'nomeServico':nomeServico.value, 
-                        'dataServico':dataDisponivel.value,
-                        'funcionarioAtribuido':funcionarioSelect.value,
-                        'horarioServico':horarioServico.value,
-                        'duracaoServico':duracao.value,
-                        'precoServico':preco.value
-                    }
+                        'funcionarioId':funcionarioSelect.value,
+                        'precoServico':preco.value,
+                        'duracaoServico':duracao.value
+                        }
+
                         const response = await fetch(`${secoesAdmin.servicos.path}/cadastrar`,
                         {method:'POST',
                         headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
                         body: JSON.stringify(servico)
 
                         });
-                        if(!response.ok) return alert ('Nao foi possivel cadastrar o serviço');
-
                         console.log(response)
+                        // if(!response.ok) return alert ('Nao foi possivel cadastrar o serviço');
+
+
                     }catch(e){if(e) throw e}
                 })
             }
@@ -529,6 +548,42 @@
 
         document.getElementById('admin-create-close').addEventListener('click', () => {
             createBackdrop.hidden = true;
+        });
+
+        document.getElementById('admin-schedule-close').addEventListener('click', () => {
+            scheduleBackdrop.hidden = true;
+        });
+
+        scheduleBackdrop.addEventListener('click', event => {
+            if (event.target === scheduleBackdrop) scheduleBackdrop.hidden = true;
+        });
+
+        scheduleForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!scheduleForm.reportValidity()) return;
+
+            const formData = new FormData(scheduleForm);
+
+            const info = {
+                dataAgendamento: formData.get('dataAgendamento'),
+                hora: formData.get('hora'),
+                fk_servico: Number(scheduleForm.dataset.serviceId)
+            };
+
+            try {
+                const response = await fetch('/administrativo/horarios/cadastrar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(info)
+                });
+                const message = await response.text();
+                if (!response.ok) throw new Error(message || 'Não foi possível cadastrar o horário.');
+
+                alert(message || 'Horário cadastrado com sucesso.');
+                scheduleBackdrop.hidden = true;
+            } catch (error) {
+                alert(error.message || 'Ocorreu um erro ao cadastrar o horário.');
+            }
         });
 
         createBackdrop.addEventListener('click', event => {

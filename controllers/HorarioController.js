@@ -1,5 +1,20 @@
 const {HorarioService} = require('../services/HorarioServices');
 class HorarioController{
+
+    static async getHorariosWhereDateIs(req,res){
+        try{
+            const horario = await HorarioService.getHorarioById(req.params.hid)
+
+            if(!horario) return res.status(404).json("Horario nao encontrado");
+
+            const allHorarios = await HorarioService.getHorariosWhereDataIs(horario.dataAgendamento)
+
+            if(!allHorarios) return res.status(404).json('Nao há horarios nessa data')
+
+            return res.status(200).json(allHorarios);
+
+        }catch(e){if(e) return res.status(400).json('Erro interno ao consultar os horários')}
+    }
     static async getHorarios(req,res){
         try{
             const serviceId = req.params.sid;
@@ -18,13 +33,16 @@ class HorarioController{
         try{
 
             //Cabe ao funcionário ou ao admin criar um horário?
-            const serviceId = req.params.sid;
-            const hora = req.body.hora;
-            if(!hora || !serviceId) return res.status(400).json('Erro ao criar o horário');
+            const {fk_servico, hora, dataAgendamento} = req.body
+            if(!fk_servico || !hora || !dataAgendamento) return res.status(400).json('Erro ao criar o horário');
             
-            await HorarioService.addHorario(hora,serviceId);
+            console.log(fk_servico,hora,dataAgendamento)
+            const result = await HorarioService.addHorario(fk_servico,hora,dataAgendamento);
+            console.log(result)
+            if(result) return res.status(200).json('Horário criado!')
 
-            return res.status(200).json('Horario adicionado com sucesso');
+            return res.status(400).json('O horario nao foi criado')
+
         }catch(e){
             return res.status(400).json('Erro interno ao criar o horário')
         }

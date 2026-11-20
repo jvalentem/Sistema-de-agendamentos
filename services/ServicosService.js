@@ -1,34 +1,24 @@
 const pool = require('../data/mysql').pool;
 const { FuncionarioService } = require('./FuncionarioService');
+const { HorarioService } = require('./HorarioServices');
 class ServicosService{
 
 
-    static formatDate(dataAgendamento){
-        //RETORNA A DATA FORMATADA DO BANCO
-        if (!dataAgendamento) return;
-        return new Intl.DateTimeFormat('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            timeZone: 'UTC' // evita deslocamento de dia em datas puras YYYY-MM-DD
-        }).format(new Date(dataAgendamento));
-
-    }
     static async createService(info){
-        if(!info) return false;
-        const insertQuery = 'INSERT INTO servicos(nome,fk_funcionario,preco,duracao) VALUES (?,?,?,?)';
+        try{
 
-        await pool.query(insertQuery,[info.nomeServico,info.funcionarioId,info.precoServico,info.duracaoServico]);
+            if(!info) return false;
+            
+            const insertQuery = 'INSERT INTO servicos(nome,fk_funcionario,preco,duracao) VALUES (?,?,?,?)';
 
-        return true;
+            const result = await pool.query(insertQuery,[info.nomeServico,info.funcionarioId,info.precoServico,info.duracaoServico]);
+            
+            return true;
+
+        }catch(e){if(e) throw e}
     }
 
-    static async getHorarios(id){
-        const selectQuery = 'SELECT horarios.* FROM servicos JOIN horarios ON horarios.fk_servico = servicos.id where servicos.id = ?';
-        const [horarios] = await pool.query(selectQuery,[Number(id)]);
-        horarios.forEach(h=> h.dataAgendamento = this.formatDate(h.dataAgendamento))
-        return horarios || [];
-    }
+
     static async getServiceById(id){
 
         try{
@@ -36,7 +26,7 @@ class ServicosService{
             const [[servico]] = await pool.query(selectQuery, [id]);
         
             if (!servico)  return false 
-            servico.horarios = await this.getHorarios(id);
+            servico.horarios = await HorarioService.getHorariosFromServico(id);
                         
             return servico || false;
         }catch(e){throw e}

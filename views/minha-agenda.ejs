@@ -11,6 +11,7 @@
                     <p><strong>Serviço:</strong> <span id="details-nome-servico"></span></p>
                     <p><strong>Atendente:</strong> <span id="details-nome-funcionario"></span></p>
                     <p><strong>Cliente:</strong> <span id="details-nome-cliente"></span></p>
+                    <p><strong>Data:</strong> <span id="details-data"></span></p>
                     <p><strong>Horário:</strong> <span id="details-horario"></span></p>
                 </div>
             </div>
@@ -56,9 +57,11 @@
         }
 
         function defineDetailsWindow(details){
+            console.log(details)
             detailsWindow.querySelector('#details-nome-servico').textContent = details.nome_servico;
             detailsWindow.querySelector('#details-nome-funcionario').textContent = details.nome_funcionario;
             detailsWindow.querySelector('#details-nome-cliente').textContent = details.nome_cliente;
+            detailsWindow.querySelector('#details-data').textContent = details.dataAgendamento
             detailsWindow.querySelector('#details-horario').textContent = details.horario;
         }
 

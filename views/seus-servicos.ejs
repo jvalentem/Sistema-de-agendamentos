@@ -23,7 +23,7 @@
             </div>
 
             <div class="servico-actions">
-                <button id=<%= "horarios-s" + s.id%> class="visualizar-horarios">Visualizar horários</button>
+                <button id=<%= "horarios-s" + s.id%> class="visualizar-horarios">Visualizar datas e horários</button>
             </div>
         </div>
     <%})%>
@@ -43,13 +43,117 @@
         horariosWindow.setAttribute('aria-hidden', 'true');
     }
 
-    
-    function defineHorarios(horarios){
+    function adicionarBloco(card, flex = null){
+        if(!card) return false
+        const bloco = document.createElement('div');
+
+        if(flex) bloco.style.display = 'flex';
+
+        card.appendChild(bloco);
+
+        return bloco;
+
+    }
+
+    function adicionarTexto(card,label){
+        if(!card || !label) return false;
+
+        const row = document.createElement('p');
+        row.textContent = label;
+
+        card.appendChild(row);
+
+        return row
+    }
+
+    function adicionarBotao(card,label,funct){
+        if(!card || !label || !funct) return false;
+
+        const button = document.createElement('button');
+        button.textContent = label;
+
+        button.onclick = funct;
+
+        card.appendChild(button);
+
+        return button
+    }
+
+    // let dateCache
+
+    function previneRepeatedDates(vector){
+        const formattedDateArray = []
+        
+        for(let v of vector){
+
+            const dateExists = formattedDateArray.find(h => h.dataAgendamento == v.dataAgendamento)
+
+            if(dateExists) continue; 
+
+            formattedDateArray.push(v);
+        }
+
+        return formattedDateArray
+    }
+
+    function previneRepeatedHours(horarios){
+        const formattedHourArray = []
+
+        for(let h of horarios){
+            const horarioExiste = formattedHourArray.find(hour => hour.hora == h.hora)
+            if(horarioExiste) continue;
+
+            formattedHourArray.push(h);
+        }
+
+        return formattedHourArray
+    }
+
+    function defineDatas(horario){
         horariosBox.replaceChildren();
-        if(horarios.length === 0){
+
+        
+        if(horario.length === 0){
             const emptyMessage = document.createElement('p');
             emptyMessage.className = 'admin-message';
             emptyMessage.textContent = 'Nenhum horário disponível para este serviço.';
+            horariosBox.appendChild(emptyMessage);
+            return;
+        }
+
+
+
+        previneRepeatedDates(horario).forEach(h =>{
+            const bloco = adicionarBloco(horariosBox,true)
+            const textoData = adicionarTexto(bloco,h.dataAgendamento)
+            
+            // dateCache = textoData.textContent;
+            
+
+            //Informando a data do agendamento (nesse caso do horario disponivel pra agendar)
+            
+            adicionarBotao(bloco,'Visualizar horários',async ()=>{
+
+                try{
+                    const response = await fetch(`/servico/${h.fk_servico}/data/${h.id}/horarios`,{method:'GET'});
+                    if(!response.ok) throw new Error('Não foi possível carregar os horários.');
+
+                    const horarios = await response.json();
+                    if(!Array.isArray(horarios)) throw new Error('A resposta de horários é inválida.');
+
+                    defineHorarios(previneRepeatedHours(horarios));
+                }catch(error){alert(error.message || 'Não foi possível carregar os horários.')}
+            })
+        })
+
+    }
+    function defineHorarios(horarios){
+        horariosBox.replaceChildren();
+
+        if(horarios.length === 0){
+            const emptyMessage = document.createElement('p');
+            emptyMessage.className = 'admin-message';
+            emptyMessage.textContent = 'Nenhum horário disponível nesta data.';
             horariosBox.appendChild(emptyMessage);
             return;
         }
@@ -74,12 +178,15 @@
             if(!serviceId) return false;
 
             try{
-                const response = await fetch(`/servico/${serviceId}/horarios`,{method:'GET'});
-                if(!response.ok) throw new Error('Não foi possível carregar os horários.');
+                const response = await fetch(`/servico/${serviceId}/datas`,{method:'GET'});
+                console.log(response)
+                if(!response.ok) throw new Error('Não foi possível carregar os horários!');
                 const horarios = await response.json();
+
                 if(!Array.isArray(horarios)) throw new Error('A resposta de horários é inválida.');
 
-                defineHorarios(horarios);
+                defineDatas(horarios)
+
                 horariosWindow.hidden = false;
                 horariosWindow.setAttribute('aria-hidden', 'false');
             }catch(error){

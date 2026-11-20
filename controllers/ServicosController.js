@@ -1,18 +1,17 @@
 const {ServicosService} = require('../services/ServicosService');
+const {HorarioService} = require('../services/HorarioServices')
 const {AgendamentoService} = require('../services/AgendamentoServices')
-const {HorarioService} = require('../services/HorarioServices');
-const { FuncionarioService } = require('../services/FuncionarioService');
 const {ClienteService} = require('../services/ClienteService');
 
 class ServicosController{
 
-    static async getHorarios(req,res){
+    static async getDatas(req,res){
         try{
             const serviceId = req.params.sid;
 
             if(!serviceId) return res.status(400).json('Serviço não informado');
 
-            const horarios = await ServicosService.getHorarios(serviceId);
+            const horarios = await HorarioService.getHorariosFromServico(serviceId);
             
             return res.status(200).json(horarios);
         }catch(e){
@@ -20,15 +19,18 @@ class ServicosController{
         }
     }
     static async criarServico(req,res){
-        const info = req.body;
-        if(!info) return res.status(400).json('Erro ao criar o serviço');
-        
-        info.funcionarioId = req.session.user.id;
-        console.log(info);
+        try{
+            const info = req.body; 
 
-        await ServicosService.createService(info);
+            const result = await ServicosService.createService(info);
+            
+            if(result) return res.status(200).json('Serviço criado!');
 
-        return res.redirect('/funcionario/servicos')
+            return res.status(400).json('Erro ao criar o serviço');
+
+        }catch(e){
+            return res.status(400).json(e);
+        }
     }
 
     static async mudarStatus(req,res){
@@ -68,6 +70,7 @@ class ServicosController{
         return res.render('single-service', {servico})
     }
 
+    
     static async agendarServico(req,res){
         try {
             const sid = req.params.sid;
