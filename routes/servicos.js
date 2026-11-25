@@ -6,13 +6,14 @@ const {HorarioController} = require('../controllers/HorarioController');
 const {authorize} = require('../middlewares/authorize');
 const {sessionActive} = require('../middlewares/sessionActive')
 const {isSameFuncionario} = require('../middlewares/isSameFuncionario')
+const {agendamentoRateLimit} = require('../middlewares/agendamentoRateLimit');
 
 
 //Apenas admins podem criar novos serviços
-router.post('/criar',authorize('admin'))
+router.post('/criar',authorize('admin'),ServicosController.criarServico);
 
 
-router.post('/agendar/:sid', ServicosController.agendarServico);
+router.post('/agendar/:sid', agendamentoRateLimit, ServicosController.agendarServico);
 router.post('/:sid/horarios/criar',authorize('admin'),HorarioController.createHorario);
 
 router.get('/:sid',ServicosController.getServiceById);

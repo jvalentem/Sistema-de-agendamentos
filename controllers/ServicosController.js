@@ -14,9 +14,7 @@ class ServicosController{
             const horarios = await HorarioService.getHorariosFromServico(serviceId);
             
             return res.status(200).json(horarios);
-        }catch(e){
-            return res.status(500).json('Erro ao consultar os horarios');
-        }
+        }catch(e){console.error(e)}
     }
     static async criarServico(req,res){
         try{
@@ -28,9 +26,7 @@ class ServicosController{
 
             return res.status(400).json('Erro ao criar o serviço');
 
-        }catch(e){
-            return res.status(400).json(e);
-        }
+        }catch(e){console.error(e)}
     }
 
     static async mudarStatus(req,res){
@@ -101,7 +97,6 @@ class ServicosController{
 
             return res.status(200).json('Agendamento criado com sucesso!')
         } catch (error) {
-            console.log('erro:',error)
             return res.status(500).json({error_message: 'Erro interno ao criar o agendamento.'});
         }
     }
@@ -118,9 +113,7 @@ class ServicosController{
         
             return res.status(200).json('Sucesso!');
 
-        }catch(e){
-            if(e) throw new Error(e)
-        }
+        }catch(e){console.error(e)}
     
     }
 

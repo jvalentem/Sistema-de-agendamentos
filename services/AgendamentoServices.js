@@ -1,25 +1,25 @@
 const pool = require('../data/mysql').pool
 const { ServicosService } = require('./ServicosService');
-
+const {HorarioService} = require('./HorarioServices')
 class AgendamentoService{
     
     static async getAgendamentos(){
         //retorna todo o historico de agendamentos
         //Incluir query para retornar o agendamento completo
+
         const selectQuery = 'SELECT agendamentos.*, clientes.nome AS nome_cliente, usuarios.nome AS nome_funcionario, servicos.nome AS nome_servico, horarios.hora AS horario, horarios.dataAgendamento AS dataAgendamento FROM agendamentos JOIN clientes ON clientes.id = agendamentos.fk_cliente JOIN usuarios ON usuarios.id = agendamentos.fk_funcionario JOIN servicos ON servicos.id = agendamentos.fk_servico JOIN horarios ON horarios.id = agendamentos.fk_horario'
         const [agendamentos] = await pool.query(selectQuery);
         agendamentos.forEach(agendamento => {
-            agendamento.dataAgendamento = ServicosService.formatDate(agendamento.dataAgendamento);
+            agendamento.dataAgendamento = HorarioService.formatDate(agendamento.dataAgendamento);
         });
-        console.log(agendamentos)
         return agendamentos;
     }
     static async getAgendamentoByID(sid){
         const selectQuery ='SELECT agendamentos.*, clientes.nome AS nome_cliente,usuarios.nome AS nome_funcionario,servicos.nome AS nome_servico, horarios.hora AS horario, horarios.dataAgendamento AS dataAgendamento FROM agendamentos JOIN clientes ON clientes.id = agendamentos.fk_cliente JOIN usuarios ON usuarios.id = agendamentos.fk_funcionario JOIN servicos ON servicos.id = agendamentos.fk_servico JOIN horarios ON horarios.id = agendamentos.fk_horario WHERE agendamentos.id = ?'
         
         const [[agendamento]] = await pool.query(selectQuery,[sid])
-
-        if (agendamento) agendamento.dataAgendamento = ServicosService.formatDate(agendamento.dataAgendamento);
+    
+        if (agendamento) agendamento.dataAgendamento = HorarioService.formatDate(agendamento.dataAgendamento);
 
         return agendamento || false;
     }
@@ -32,11 +32,12 @@ class AgendamentoService{
     }
 
     static async canAlterAgendamento(user,agendamento){
+        
         const isAdmin = user.acesso === 'admin';
         const isSameFuncionario = user.id === agendamento.fk_funcionario;
-        const isSameCliente = user.id === agendamento.fk_cliente;
+
         
-        return isAdmin || isSameCliente || isSameFuncionario
+        return isAdmin || isSameFuncionario
     }
 
     static async cancelarAgendamento(sid, user){
@@ -61,21 +62,17 @@ class AgendamentoService{
                 await conn.rollback();
                 throw new Error('Você nao tem permissão para cancelar este agendamento')
             }
-            const statusCanceladoQuery = `update agendamentos set aStatus = "Cancelado" where id = ?`
-            const livrarHorarioQuery = `update horarios set ocupado = false where id = ?`
+            const statusCanceladoQuery = `update agendamentos set aStatus = "Cancelado" where id = ? AND aStatus = "Em andamento"`
+            const livrarHorarioQuery = `update horarios set ocupado = false where id = ? AND ocupado = true`
         
-            const cancelado = await conn.query(statusCanceladoQuery,[agendamento.id])
-            const horarioLivre = await conn.query(livrarHorarioQuery,[horario.id])  
-            if(cancelado.affectedRows === 0){await conn.rollback(); return false} //O agendamento ja estava cancelado
-            if(horarioLivre.affectedRows === 0){await conn.rollback(); return false} //O horario ja estava livre
+            await conn.query(statusCanceladoQuery,[agendamento.id])
+            await conn.query(livrarHorarioQuery,[horario.id])  
             
             await conn.commit();
             return true;
         
-        }catch(e){
-            await conn.rollback();
-            throw e;
-        }finally{
+        }catch(e){console.error(e)}
+        finally{
             conn.release();
         }
         
@@ -91,10 +88,8 @@ class AgendamentoService{
         
             await conn.commit();
 
-        }catch(e){
-            await conn.rollback();
-            throw e;
-        }finally{
+        }catch(e){console.error(e)}
+        finally{
             conn.release();
         }
         
@@ -112,15 +107,12 @@ class AgendamentoService{
         
         const servico = await ServicosService.getServiceById(servicoId);
         if (!servico || !servico.ativo) { await conn.rollback(); return false; }
-        console.log(servico)
-        console.log("serviço consultado")
         // Reserva atômica: só um UPDATE consegue trocar false -> true
         const [reserva] = await conn.query(
-            'UPDATE horarios SET ocupado = true WHERE id = ? AND ocupado = false',
-            [horarioId]);
+            'UPDATE horarios SET ocupado = true WHERE id = ? AND ocupado = false AND fk_servico = ?',
+            [horarioId,servico.id]);
         
             if (reserva.affectedRows === 0) { await conn.rollback(); return false; } // já estava ocupado
-            console.log("status do horario alterado")
         
             
         await conn.query(

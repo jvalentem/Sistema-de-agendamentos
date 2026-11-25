@@ -138,7 +138,7 @@ Routes → Middlewares → Controllers → Services → MySQL
 
 5. Alimente o banco
 ```bash
-   node /scripts/seed.js
+   node scripts/seed.js
    ```
 
 6. Inicie a aplicação:

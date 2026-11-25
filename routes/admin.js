@@ -19,7 +19,7 @@ router.get('/agendamentos',AdminController.getAgendamentos);
 router.get('/clientes',AdminController.getClientes)
 
 //!!
-router.post('/funcionarios/cadastrar',()=>{})
+router.post('/funcionarios/cadastrar',(req,res)=>{})
 router.post('/servicos/cadastrar',ServicosController.criarServico)
 router.post('/horarios/cadastrar',HorarioController.createHorario)
 

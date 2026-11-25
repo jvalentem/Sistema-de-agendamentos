@@ -5,8 +5,6 @@ const {UserService} = require('../services/UserService');
 const {HorarioService} = require('../services/HorarioServices');
 const {ClienteService} = require('../services/ClienteService');
 
-
-
 test('Cadastro de serviço', async()=>{
     const servico = {
                         'nomeServico':'Basquete', 
@@ -26,4 +24,21 @@ test('get de horarios', async()=>{
     const [horarios] = await HorarioService.getHorariosFromServico(servico.id);
 
     expect(horarios).not.toBe(false);
+})
+
+
+test('criação de serviços', async()=>{
+    const [funcionarioEscolhido] = await FuncionarioService.getFuncionarios()
+
+    const info = {
+        nomeServico:'Barbearia feminina',
+        funcionarioId:funcionarioEscolhido.id,
+        precoServico:30.00,
+        duracaoServico:60
+    }
+    if(!info.funcionarioId) return;
+
+    const result = await ServicosService.createService(info)
+
+    expect(result).toBe(true);
 })

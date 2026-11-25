@@ -13,7 +13,7 @@ class HorarioController{
 
             return res.status(200).json(allHorarios);
 
-        }catch(e){if(e) return res.status(400).json('Erro interno ao consultar os horários')}
+        }catch(e){console.error(e)}
     }
     static async getHorarios(req,res){
         try{
@@ -24,9 +24,7 @@ class HorarioController{
             if(!horarios) return res.status(404).json('Nenhum horário disponível!')
                 
             return res.status(200).json(horarios);
-        }catch(e){
-            return res.status(400).json('Erro interno ao consultar os serviços')
-        }
+        }catch(e){console.error(e)}
     }
 
     static async createHorario(req,res){
@@ -36,16 +34,12 @@ class HorarioController{
             const {fk_servico, hora, dataAgendamento} = req.body
             if(!fk_servico || !hora || !dataAgendamento) return res.status(400).json('Erro ao criar o horário');
             
-            console.log(fk_servico,hora,dataAgendamento)
             const result = await HorarioService.addHorario(fk_servico,hora,dataAgendamento);
-            console.log(result)
             if(result) return res.status(200).json('Horário criado!')
 
             return res.status(400).json('O horario nao foi criado')
 
-        }catch(e){
-            return res.status(400).json('Erro interno ao criar o horário')
-        }
+        }catch(e){console.error(e)}
     }
 
     static async apagarHorario(req,res){
@@ -58,9 +52,7 @@ class HorarioController{
             
             await HorarioService.apagarHorario(horarioId);
             return res.status(200).json('Horario apagado')
-        }catch(e){
-            return res.status(400).json('Erro interno ao apagar o horário')
-        }
+        }catch(e){console.error(e)}
     }
 }
 

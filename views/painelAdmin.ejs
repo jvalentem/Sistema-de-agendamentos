@@ -181,7 +181,6 @@
                 
                 fieldsToUpdate.push({ row, field, input });
             }
-            console.log('DATACLUSTER:', dataCluster)
             const response = await fetch(`/servico/editar/${serviceId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -337,7 +336,6 @@
                         const response = await fetch(`/funcionario/${entry.id}/servicos`, {method:'GET'});
 
                         const result = await response.json();
-                        console.log(result)
                         if (!response.ok) throw new Error(typeof result === 'string' ? result : 'Não foi possível carregar os serviços.');
 
                         if (!Array.isArray(result) || result.length === 0) {
@@ -348,7 +346,7 @@
                         adminList.replaceChildren(...result.map(servico => carregarInfo('servicos', servico)));
 
 
-                    }catch(e){if(e) throw e}
+                    }catch(e){console.error(e)}
                 });
                 adicionarBotao(card,entry.ativo == true? 'Suspender Funcionário' : 'Retornar Funcionário', async()=>{
                     //Se o funcionario tiver serviços ativos, o serviço também será desativado até que seja atribuído outro funcionário
@@ -386,6 +384,7 @@
                 });
 
             } else if (section === 'agendamentos') {
+
                 adicionarCampo(card,'ID', entry.id)
 
                 adicionarCampo(card, 'Serviço', entry.nome_servico);
@@ -430,7 +429,9 @@
             showMessage('Carregando...');
 
             try {
+
                 const response = await fetch(config.path, { method: 'GET' });
+
                 if (!response.ok) throw new Error('Não foi possível carregar os dados.');
 
                 const entries = await response.json();
@@ -453,8 +454,24 @@
 
             if (creationReason === 'cadastro-funcionario') {
                 createTitle.textContent = 'Cadastrar funcionário';
-                adicionarInput(createForm, 'Nome do funcionário', '', 'text', 'nome');
-                adicionarInput(createForm, 'Senha', '', 'password', 'senha');
+                const inputNome = adicionarInput(createForm, 'Nome do funcionário', '', 'text', 'nome');
+                const inputSenha = adicionarInput(createForm, 'Senha', '', 'password', 'senha');
+                adicionarBotao(createForm,'Concluir',async()=>{
+                    try{
+                        const funcionario = {'nome':inputNome.value, 'senha':inputSenha.value}
+                        if(!funcionario.nome || !funcionario.senha) throw new Error("Informe o usuario e a senha")
+                        
+                        const response = fetch(`${secoesAdmin['funcionarios'].path}/cadastrar`,
+                        {method:'POST',
+                        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+                        body: JSON.stringify(funcionario)
+                        });
+                        
+                        const result = await response.json();
+
+                        
+                    }catch(e){console.error(e)}
+                })
                 return;
             }
 
@@ -518,11 +535,10 @@
                         body: JSON.stringify(servico)
 
                         });
-                        console.log(response)
-                        // if(!response.ok) return alert ('Nao foi possivel cadastrar o serviço');
+                        if(!response.ok) return alert ('Nao foi possivel cadastrar o serviço');
 
 
-                    }catch(e){if(e) throw e}
+                    }catch(e){console.error(e)}
                 })
             }
         }

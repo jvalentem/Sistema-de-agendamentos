@@ -3,7 +3,6 @@ function defineSession(){
     return (req,res,next)=>{
         res.locals.session = req.session;
         res.locals.user = req.session.user;
-        console.log("sessao definida")
         next();
     }
 }

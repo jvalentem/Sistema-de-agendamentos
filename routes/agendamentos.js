@@ -10,6 +10,4 @@ router.get('/detalhar/:id',AgendamentosController.detalhar)
 
 router.delete('/detalhar/:sid/cancelar',AgendamentosController.cancelar)
 
-router.delete('/:sid',authorize('admin'),AgendamentosController.apagarRegistro)
-
 module.exports = router

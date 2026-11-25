@@ -6,7 +6,7 @@ class UserService{
 
     static async getUsers(){
         const selectQuery = 'SELECT * FROM usuarios'
-        const [usuarios] = await pool.query(usuarios);
+        const [usuarios] = await pool.query(selectQuery);
 
         return usuarios
     }
@@ -27,7 +27,6 @@ class UserService{
 
             return user
         } catch (error) {
-            console.log(error)
         }
 
     }

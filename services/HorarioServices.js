@@ -8,7 +8,7 @@ class HorarioService{
 
             return horario || false;
             
-        }catch(e){if(e) throw e}
+        }catch(e){console.error(e)}
     } 
     static formatDate(dataAgendamento){
         //RETORNA A DATA FORMATADA DO BANCO
@@ -32,7 +32,7 @@ class HorarioService{
             return horarios || false;
 
 
-        }catch(e){if(e) throw e}
+        }catch(e){console.error(e)}
     }
 
     static async getHorariosFromServico(serviceId){
@@ -50,18 +50,17 @@ class HorarioService{
         //insert into horarios values ('15:00',serviceId)
 
         const insertQuery = 'INSERT INTO horarios(hora,dataAgendamento,fk_servico) VALUES (?,?,?)';
-        console.log('criando horario...')
 
         const result = await pool.query(insertQuery,[hora,dataAgendamento,fk_servico])
 
-        console.log('hcriado')
         return true;
     }
     static async isHorarioOcupado(id){
+
         const selectQuery = `select * from horarios where id = ? and ocupado = true`
         const [result] = await pool.query(selectQuery,[id]);
 
-        return result || false;
+        return result.length > 0;
     }
     static async apagarHorario(id){
         if(!id) return false;

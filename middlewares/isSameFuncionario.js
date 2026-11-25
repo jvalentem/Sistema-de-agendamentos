@@ -7,7 +7,6 @@ async function isSameFuncionario(req,res,next){
     //Se bater: next
     //Sena: status 403
 
-    console.log('carregando serviço...')
     const serviceId = req.params.sid;
     if(!serviceId) return res.status(400).json('Erro: serviço não informado')
     

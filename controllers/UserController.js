@@ -34,9 +34,7 @@ class UserController{
             if(acesso === 'admin') return res.status(200).json({'redirectTo':'/administrativo'})
             if(acesso === 'funcionario') return res.status(200).json({'redirectTo':'/funcionario/agendamentos'});
 
-        }catch(e){
-            return res.status(400).json({error_message:e});
-        }
+        }catch(e){console.error(e)}
     }
     static async getById(req,res){
         try{
@@ -44,8 +42,7 @@ class UserController{
             const id = req.session.user.id;
             const usuario = await UserService.getUserById(id);
             return usuario;
-        }catch(e) {
-            return res.status(400).json({error_message:e});}
+        }catch(e){console.error(e)}
         }
 
     static async getAgendamentos(req,res){

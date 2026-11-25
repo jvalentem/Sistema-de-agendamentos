@@ -22,7 +22,6 @@ async function migrarSenhas() {
             );
         }
 
-        console.log('Senhas migradas com sucesso!');
     } catch (error) {
         console.error('Erro na migração:', error);
     } finally {

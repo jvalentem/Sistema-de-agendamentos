@@ -19,7 +19,7 @@ async function insertFuncionarios(){
         const [rows] = await conn.query('SELECT * FROM USUARIOS WHERE nome IN (?,?,?,?)', userNames)
 
         //previne a inserção de usuários duplicados caso o script ja tenha sido executado uma vez
-        if(rows.length > 0){console.log('usuarios ja existem'); await conn.rollback(); return}
+        if(rows.length > 0){await conn.rollback(); return}
 
         const generalPassword = process.env.GENERAL_PASSWORD;
         const hashedPaswword = await password.hashPassword(generalPassword)
@@ -29,14 +29,11 @@ async function insertFuncionarios(){
 
         for(user of userNames){
             const result = await conn.query('INSERT INTO USUARIOS(nome,senha,acesso) VALUES (?,?,?)',[user,hashedPaswword,acesso]);
-            console.log(result)
         }
 
-        conn.commit();
+        await conn.commit();
         
-    }catch(e){
-        if(e){conn.rollback(); throw e}
-    }
+    }catch(e){console.error(e)}
     finally{
         conn.release();
     }
@@ -54,17 +51,14 @@ async function insertAdmin(){
         const acesso = 'admin'
         const [rows] = await conn.query('SELECT * FROM USUARIOS WHERE nome = ?',[user]);
 
-        if(rows.length > 0){await conn.rollback(); console.log('usuario ja existe'); return}
+        if(rows.length > 0){await conn.rollback(); return}
 
         await conn.query('INSERT INTO USUARIOS(nome,senha,acesso) VALUES(?,?,?)', [user,hashedPassword,acesso]);
 
         await conn.commit();
 
-    }catch(e)
-    {
-        
-        if(e){conn.rollback(); throw e}
-    }finally{
+    }catch(e){console.error(e)}
+    finally{
         conn.release();
     }
 }
@@ -83,18 +77,17 @@ async function insertServices(){
     //cada serviço terá um funcionario definido
     const [funcionarios] = await conn.query('SELECT * FROM USUARIOS WHERE acesso = ?',['funcionario']);
 
-    if(!funcionarios){console.log('não há funcionarios cadastrados');await conn.rollback(); return}
+    if(funcionarios.length <= 0){await conn.rollback(); return}
 
 
     //antes de cadastrar, deve-se verificar se o serviço ja existe
 
     const [rows] = await conn.query('SELECT * FROM servicos WHERE nome IN(?,?,?,?)', servicos)
     
-    if(rows.length > 0){await conn.rollback(); console.log('um ou mais dos serviços ja existe'); return}
+    if(rows.length > 0){await conn.rollback(); return}
 
     //cadastro dos serviços
     for(let i in funcionarios){
-        console.log(i);
         const nomeServico = servicos[i];
         const precoServico = precos[i];
         const fk_funcionario = funcionarios[i].id;
@@ -107,10 +100,7 @@ async function insertServices(){
     }
 
     await conn.commit();
-    }catch(e)
-    {
-        if(e){conn.rollback(); throw e}
-    }
+    }catch(e){console.error(e)}
     finally{
         conn.release()
     }
@@ -127,7 +117,6 @@ async function insertHorarios(){
         const [servicos] = await conn.query('SELECT id FROM servicos');
 
         if(servicos.length === 0){
-            console.log('não há serviços cadastrados');
             await conn.rollback();
             return;
         }
@@ -141,7 +130,6 @@ async function insertHorarios(){
 
             for(const hora of horas){
                 if(horasExistentes.has(hora)){
-                    console.log('horario ja existe, pulando')
                     continue;
                 }
 
@@ -153,10 +141,8 @@ async function insertHorarios(){
         }
 
         await conn.commit();
-    }catch(e){
-        await conn.rollback();
-        throw e;
-    }finally{
+    }catch(e){console.error(e)}
+    finally{
         conn.release();
     }
 }

@@ -9,7 +9,6 @@ class FuncionarioController{
             const currentUser = req.session.user;
             const id = currentUser.acesso == 'funcionario'? currentUser.id : req.params.id;
 
-            console.log(id);
 
             const servicos = await FuncionarioService.getFuncionarioServices(id);
 
@@ -17,7 +16,7 @@ class FuncionarioController{
 
             return res.render('seus-servicos',{servicos});
 
-        }catch(e){return res.status(400).json({error_message:e})}
+        }catch(e){console.error(e)}
     }
 
     static async getAgenda(req,res){
@@ -27,7 +26,8 @@ class FuncionarioController{
             //Se o usuario for admin, ele está tentando acessar pelo fetch, entao pego o ID do funcionario pela propria URL
             //Se for um funcionario, ele esta tentando acessar normalmente pelo link, entao pego o id da sessão dele
             const id = user.acesso === 'admin' && req.params.funcionarioId ? req.params.funcionarioId : user.id
-            console.log(id)
+            
+            if(!id) return res.status(403).json('Acesso negado!') 
             const agendamentos = await FuncionarioService.getFuncionarioAgenda(id);
             
             if(!agendamentos) return res.status(404).json("Nenhum agendamento!")
@@ -36,7 +36,7 @@ class FuncionarioController{
 
             return res.status(200).json(agendamentos)
 
-       }catch(e){return res.status(400).json({error_message:e});}
+       }catch(e){console.error(e)}
     }
 
 

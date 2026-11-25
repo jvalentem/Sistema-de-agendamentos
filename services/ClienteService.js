@@ -43,7 +43,6 @@ class ClienteService{
         await pool.query(createQuery,[nome,telefone,email]);
 
         [[cliente]] = await pool.query(selectQuery,[telefone,email]);
-        console.log(cliente)
         return cliente || false;
     }
 }

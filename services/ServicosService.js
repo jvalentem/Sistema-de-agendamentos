@@ -15,7 +15,7 @@ class ServicosService{
             
             return true;
 
-        }catch(e){if(e) throw e}
+        }catch(e){console.error(e)}
     }
 
 
@@ -29,7 +29,7 @@ class ServicosService{
             servico.horarios = await HorarioService.getHorariosFromServico(id);
                         
             return servico || false;
-        }catch(e){throw e}
+        }catch(e){console.error(e)}
         
     }
 
@@ -92,7 +92,6 @@ class ServicosService{
     }
 
     static async mudarStatus(id){
-        console.log(id)
         const servico = await this.getServiceById(id);
         if(!servico) return false;
 
